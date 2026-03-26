@@ -1,0 +1,151 @@
+<resources>
+    <string name="app_name">rainsafe</string>
+    <string name="title_rainsafe">RAINSAFE</string>
+    <string name="title_smart_living">SMART LIVING</string>
+    <string name="button_login">Login</string>
+    <string name="desc_weather_icon">Weather Icon</string>
+    <string name="title_sign_in">Sign In</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="label_remember_me">Remember me</string>
+    <string name="label_forgot_password">Forgot your password</string>
+    <string name="label_create_account">Don’t have an account? Create one</string>
+    <string name="desc_user_icon">User Icon</string>
+    <string name="title_create_account">Register</string>
+    <string name="hint_email">Email Address</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="button_register">REGISTER</string>
+    <string name="label_already_have_account">Already have an account? Sign In</string>
+
+    <!-- Welcome Screen -->
+    <string name="welcome_text">wellcome</string>
+    <string name="welcome_app_name">RainSafe</string>
+    <string name="welcome_app_subtitle">Smart Laundry Control</string>
+    <string name="welcome_feature_title">Deteksi Hujan Cerdas</string>
+    <string name="welcome_feature_desc">Sensor otomatis masukkan jemuran saat hujan terdeteksi</string>
+    <string name="button_skip">Skip</string>
+    <string name="button_next">Next</string>
+
+    <!-- Login Screen -->
+    <string name="login_welcome_back">Welcome Back</string>
+    <string name="login_subtitle">Masuk ke akun RainSafe Anda</string>
+    <string name="login_tab_email">Email</string>
+    <string name="login_tab_phone">Phone + OTP</string>
+    <string name="login_label_email">Email Address</string>
+    <string name="login_label_password">Password</string>
+    <string name="login_hint_email">andi@gmail.com</string>
+    <string name="login_hint_password">12345678</string>
+    <string name="login_remember_me">Ingat saya di perangkat ini</string>
+    <string name="login_forgot_password">Lupa Password?</string>
+    <string name="login_no_account">Belum punya akun? </string>
+    <string name="login_register_here">Daftar di sini</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Buat Akun Baru</string>
+    <string name="register_subtitle">Daftar untuk menggunakan RainSafe</string>
+    <string name="register_label_fullname">Nama Lengkap</string>
+    <string name="register_hint_fullname">Ahmad Ridho</string>
+    <string name="register_label_email">Email Address</string>
+    <string name="register_hint_email">admin</string>
+    <string name="register_label_phone">Nomor Telepon</string>
+    <string name="register_hint_phone">+62 812-3456-7890</string>
+    <string name="register_label_password">Password</string>
+    <string name="register_hint_password">Pelangi.1</string>
+    <string name="register_password_helper">Minimal 8 karakter, campuran huruf besar dan kecil</string>
+    <string name="register_label_confirm_password">Konfirmasi Password</string>
+    <string name="register_hint_confirm_password">Ulangi password</string>
+    <string name="register_terms">Saya setuju dengan Syarat &amp; Ketentuan dan Kebijakan Privasi</string>
+    <string name="register_button">Buat Akun</string>
+    <string name="register_already_have_account">Sudah punya akun? </string>
+    <string name="register_login_here">Login di sini</string>
+
+    <!-- Dashboard Screen -->
+    <string name="dash_status_connected">Terhubung</string>
+    <string name="dash_updated_now">Diperbarui sekarang</string>
+    <string name="dash_location">Banjarmasin, Kalimantan Selatan</string>
+    <string name="dash_temp">27 °C</string>
+    <string name="dash_weather_desc">Cerah Berawan</string>
+    <string name="dash_humidity">Kelembaban</string>
+    <string name="dash_val_humidity">65%</string>
+    <string name="dash_wind">Angin</string>
+    <string name="dash_val_wind">12 km/h</string>
+    <string name="dash_rain_prob_label">Probabilitas</string>
+    <string name="dash_rain_prob">Hujan</string>
+    <string name="dash_val_rain_prob">5%</string>
+    <string name="dash_btn_pull_in">Masukkan Jemuran</string>
+    <string name="dash_btn_pull_out">Keluarkan Jemuran</string>
+    <string name="dash_auto_title">Otomatisasi Komprehensif</string>
+    <string name="dash_auto_desc">Mode Otomatis Jemuran Cerdas</string>
+    <string name="dash_auto_active">AKTIF</string>
+    <string name="dash_status_title">Status Jemuran</string>
+    <string name="dash_cloth_status">Jemuran Basah</string>
+    <string name="dash_cloth_start">Mulai: 15:00 WITA</string>
+    <string name="dash_cloth_pos_out">DI LUAR</string>
+    <string name="dash_label_dry_percent">Persentase Kering</string>
+    <string name="dash_val_dry_percent">45%</string>
+    <string name="dash_label_dry_est">Est. Waktu Kering</string>
+    <string name="dash_val_dry_est">2 jam 30 menit</string>
+    <string name="dash_label_quality">Rating Kualitas</string>
+    <string name="dash_val_quality">85%</string>
+    <string name="dash_label_duration">Durasi Jemuran</string>
+    <string name="dash_val_duration">0 jam 20 menit</string>
+    <string name="dash_stats_title">Statistik Hari Ini</string>
+    <string name="dash_stats_label_total">Total Waktu Jemuran</string>
+    <string name="dash_stats_val_total">6 jam 10 menit</string>
+    <string name="dash_stats_label_avg_hum">Kelembaban Rata-rata</string>
+    <string name="dash_stats_val_avg_hum">62%</string>
+    <string name="dash_stats_label_rain">Kejadian Hujan</string>
+    <string name="dash_stats_val_rain">0 kali</string>
+    <string name="dash_stats_status_safe">Aman</string>
+    <string name="dash_sensor_title">Status Sensor</string>
+    <string name="dash_sensor_rain">Sensor Hujan</string>
+    <string name="dash_sensor_light">Sensor Cahaya</string>
+    <string name="dash_sensor_hum">Sensor Kelembaban</string>
+    <string name="dash_sensor_active">Aktif</string>
+
+    <!-- History Screen -->
+    <string name="hist_tab_all">Semua</string>
+    <string name="hist_tab_laundry">Jemuran</string>
+    <string name="hist_tab_rain">Hujan</string>
+    <string name="hist_tab_sensor">Sensor</string>
+    <string name="hist_stats_weekly">Statistik Mingguan</string>
+    <string name="hist_val_laundry_count">12x</string>
+    <string name="hist_label_laundry_count">Jemuran Masuk</string>
+    <string name="hist_val_total_duration">42 jam 15 menit</string>
+    <string name="hist_label_total_duration">Total Durasi</string>
+    <string name="hist_val_rain_count">5x</string>
+    <string name="hist_label_rain_count">Hujan Terdeteksi</string>
+    <string name="hist_val_success_rate">87%</string>
+    <string name="hist_label_success_rate">Tingkat Keberhasilan</string>
+    <string name="hist_activity_title">Riwayat Aktivitas</string>
+    <string name="hist_today">HARI INI</string>
+    <string name="hist_yesterday">KEMARIN</string>
+    <string name="hist_2days_ago">2 HARI LALU</string>
+    <string name="hist_load_more">MUAT LEBIH BANYAK</string>
+
+    <!-- Profile Screen (New) -->
+    <string name="profile_name">Ahmad Ridho</string>
+    <string name="profile_email">ahmad.ridho@email.com</string>
+    <string name="profile_info_device_title">Informasi Perangkat</string>
+    <string name="profile_label_device_name">Nama Device</string>
+    <string name="profile_val_device_name">RainSafe Laundry</string>
+    <string name="profile_label_status">Status</string>
+    <string name="profile_val_status_online">Online</string>
+    <string name="profile_label_location">Lokasi</string>
+    <string name="profile_val_location">Rumah</string>
+    <string name="profile_label_firmware">Firmware</string>
+    <string name="profile_val_firmware">v2.1.0</string>
+    <string name="profile_activity_title">Aktivitas</string>
+    <string name="profile_label_total_usage">Total Penggunaan</string>
+    <string name="profile_val_total_usage">247 jam</string>
+    <string name="profile_label_last_used">Terakhir Digunakan</string>
+    <string name="profile_val_last_used">Hari Ini</string>
+    <string name="profile_label_last_status">Status Terakhir</string>
+    <string name="profile_val_last_status">Jemuran Keluar</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_history">Riwayat</string>
+    <string name="nav_settings">Pengaturan</string>
+    <string name="nav_profile">Profil</string>
+</resources>
