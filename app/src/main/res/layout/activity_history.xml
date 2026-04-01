@@ -19,7 +19,7 @@
             android:layout_height="32dp"
             android:background="@drawable/bg_rounded_white"
             android:padding="6dp"
-            android:src="@drawable/ic_sun"
+            android:src="@drawable/ic_menu"
             app:tint="@color/text_gray" />
 
         <LinearLayout
@@ -549,7 +549,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_sun"
+                android:src="@drawable/ic_home"
                 app:tint="@color/text_gray" />
 
             <TextView
@@ -571,7 +571,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_refresh"
+                android:src="@drawable/ic_history"
                 app:tint="@color/primary_blue" />
 
             <TextView
@@ -593,7 +593,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_sun"
+                android:src="@drawable/ic_settings"
                 app:tint="@color/text_gray" />
 
             <TextView

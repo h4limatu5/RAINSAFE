@@ -275,168 +275,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Notifikasi Section -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="8dp" tools:ignore="UseCompoundDrawables">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_cloud" android:contentDescription="" app:tint="@color/primary_blue"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Notifikasi" android:layout_marginStart="8dp" android:textColor="@color/primary_blue" android:textSize="12sp" android:textStyle="bold"/>
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Notifikasi Hujan" android:textColor="@color/text_dark"/>
-                        <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switchNotifHujan"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true" />
-                    </RelativeLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginVertical="12dp"/>
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Notifikasi Jemuran" android:textColor="@color/text_dark"/>
-                        <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switchNotifJemuran"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true" />
-                    </RelativeLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginVertical="12dp"/>
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Notifikasi Error" android:textColor="@color/text_dark"/>
-                        <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switchNotifError"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true" />
-                    </RelativeLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Tampilan Section -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="8dp" tools:ignore="UseCompoundDrawables">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_sun" android:contentDescription="" app:tint="@color/primary_blue"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tampilan" android:layout_marginStart="8dp" android:textColor="@color/primary_blue" android:textSize="12sp" android:textStyle="bold"/>
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dark Mode" android:textColor="@color/text_dark"/>
-                        <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switchDarkMode"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"/>
-                    </RelativeLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginVertical="12dp"/>
-                    <RelativeLayout
-                        android:id="@+id/btnGantiBahasa"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bahasa" android:textColor="@color/text_dark"/>
-                        <TextView
-                            android:id="@+id/tvBahasa"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="Indonesia"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_dark"/>
-                    </RelativeLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Keamanan Section -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="8dp" tools:ignore="UseCompoundDrawables">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_lock" android:contentDescription="" app:tint="@color/primary_blue"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Keamanan" android:layout_marginStart="8dp" android:textColor="@color/primary_blue" android:textSize="12sp" android:textStyle="bold"/>
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <RelativeLayout
-                        android:id="@+id/btnGantiPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ganti Password" android:textColor="@color/text_dark"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:src="@drawable/ic_arrow_next" android:contentDescription="" app:tint="@color/primary_blue"/>
-                    </RelativeLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginVertical="12dp"/>
-                    <RelativeLayout
-                        android:id="@+id/btnLogout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Logout Semua Device" android:textColor="@color/text_dark"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:src="@drawable/ic_arrow_next" android:contentDescription="" app:tint="@color/primary_blue"/>
-                    </RelativeLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Tentang Section -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="8dp" tools:ignore="UseCompoundDrawables">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_email" android:contentDescription="" app:tint="@color/primary_blue"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tentang" android:layout_marginStart="8dp" android:textColor="@color/primary_blue" android:textSize="12sp" android:textStyle="bold"/>
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Versi Aplikasi" android:textColor="@color/text_dark"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="v1.0.0" android:textStyle="bold" android:textColor="@color/text_dark"/>
-                    </RelativeLayout>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginVertical="12dp"/>
-                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Developer" android:textColor="@color/text_dark"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="RainSafe @ 2026" android:textStyle="bold" android:textColor="@color/text_dark"/>
-                    </RelativeLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <View android:layout_width="match_parent" android:layout_height="20dp"/>
         </LinearLayout>
     </ScrollView>
@@ -460,7 +298,7 @@
             android:gravity="center"
             android:orientation="vertical"
             tools:ignore="UseCompoundDrawables">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_sun" android:contentDescription="" app:tint="@color/text_gray"/>
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" android:contentDescription="" app:tint="@color/text_gray"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Beranda" android:textColor="@color/text_gray" android:textSize="10sp" tools:ignore="SmallSp"/>
         </LinearLayout>
 
@@ -472,7 +310,7 @@
             android:gravity="center"
             android:orientation="vertical"
             tools:ignore="UseCompoundDrawables">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_refresh" android:contentDescription="" app:tint="@color/text_gray"/>
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" android:contentDescription="" app:tint="@color/text_gray"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Riwayat" android:textColor="@color/text_gray" android:textSize="10sp" tools:ignore="SmallSp"/>
         </LinearLayout>
 

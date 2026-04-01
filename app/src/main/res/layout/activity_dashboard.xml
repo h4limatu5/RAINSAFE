@@ -334,7 +334,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:gravity="center_vertical">
-                <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_refresh" app:tint="@color/text_dark" android:rotation="-90" android:contentDescription="" />
+                <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_history" app:tint="@color/text_dark" android:contentDescription="" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Statistik Hari Ini" android:layout_marginStart="8dp" android:textStyle="bold" android:textColor="@color/text_dark"/>
             </LinearLayout>
 
@@ -394,7 +394,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_sun" app:tint="@color/primary_blue" android:contentDescription="" />
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/primary_blue" android:contentDescription="" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Beranda" android:textColor="@color/primary_blue" android:textSize="10sp"/>
         </LinearLayout>
 
@@ -405,7 +405,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_refresh" app:tint="@color/text_gray" android:contentDescription="" />
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/text_gray" android:contentDescription="" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Riwayat" android:textColor="@color/text_gray" android:textSize="10sp"/>
         </LinearLayout>
 

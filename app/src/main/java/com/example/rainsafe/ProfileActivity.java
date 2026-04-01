@@ -8,12 +8,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rainsafe.data.AppDatabase;
 import com.example.rainsafe.data.entity.Device;
+import com.example.rainsafe.data.entity.User;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView tvProfileName, tvProfileEmail, tvDeviceName, tvStatus, tvLocation, tvFirmware;
     private TextView tvTotalUsage, tvLastUsed, tvLastStatus;
     private AppDatabase db;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +34,14 @@ public class ProfileActivity extends AppCompatActivity {
     private void initViews() {
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
-        tvDeviceName = findViewById(R.id.tvDeviceName); // Saya perlu menambahkan ID ini di XML
-        tvStatus = findViewById(R.id.tvStatus); // Saya perlu menambahkan ID ini di XML
-        tvLocation = findViewById(R.id.tvLocation); // Saya perlu menambahkan ID ini di XML
-        tvFirmware = findViewById(R.id.tvFirmware); // Saya perlu menambahkan ID ini di XML
+        tvDeviceName = findViewById(R.id.tvDeviceName);
+        tvStatus = findViewById(R.id.tvStatus);
+        tvLocation = findViewById(R.id.tvLocation);
+        tvFirmware = findViewById(R.id.tvFirmware);
         
-        tvTotalUsage = findViewById(R.id.tvTotalUsage); // Saya perlu menambahkan ID ini di XML
-        tvLastUsed = findViewById(R.id.tvLastUsed); // Saya perlu menambahkan ID ini di XML
-        tvLastStatus = findViewById(R.id.tvLastStatus); // Saya perlu menambahkan ID ini di XML
+        tvTotalUsage = findViewById(R.id.tvTotalUsage);
+        tvLastUsed = findViewById(R.id.tvLastUsed);
+        tvLastStatus = findViewById(R.id.tvLastStatus);
     }
 
     private void observeRealtimeData() {
@@ -47,12 +52,13 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        // Simulasi User data (karena kita belum simpan ID user yang login)
-        // Dalam real-app, gunakan SharedPreferences atau Session Manager untuk ambil ID user
-        executorService().execute(() -> {
-            // Kita ambil user pertama untuk contoh
-            // User user = db.userDao().getUserById(1); 
-            // runOnUiThread(() -> { if(user != null) updateUserUI(user); });
+        // Load User data
+        executorService.execute(() -> {
+            // Asumsi user dengan ID 1 adalah user yang sedang login (demo purposes)
+            User user = db.userDao().getUserById(1); 
+            if (user != null) {
+                runOnUiThread(() -> updateUserUI(user));
+            }
         });
     }
 
@@ -65,6 +71,13 @@ public class ProfileActivity extends AppCompatActivity {
         if (tvLastStatus != null) {
             tvLastStatus.setText(device.isClosed() ? "Jemuran Di Dalam" : "Jemuran Di Luar");
         }
+    }
+
+    private void updateUserUI(User user) {
+        if (tvProfileName != null) tvProfileName.setText(user.getFullName());
+        if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
+        if (tvTotalUsage != null) tvTotalUsage.setText(user.getTotalUsageHours() + " jam");
+        if (tvLastUsed != null) tvLastUsed.setText(user.getLastUsed());
     }
 
     private void setupNavigation() {
@@ -81,8 +94,10 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
     }
-    
-    private java.util.concurrent.Executor executorService() {
-        return java.util.concurrent.Executors.newSingleThreadExecutor();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 }
