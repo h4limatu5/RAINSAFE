@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">RainSafe</string>
+
+    <!-- Dashboard -->
+    <string name="desc_menu">Menu</string>
+    <string name="status_connected">Terhubung</string>
+    <string name="desc_refresh">Refresh</string>
+    <string name="desc_notifications">Notifikasi</string>
+    <string name="desc_weather_icon">Ikon Cuaca</string>
+    <string name="default_temp">27°C</string>
+    <string name="default_weather_desc">Cerah Berawan</string>
+    <string name="humidity_label">Kelembaban\n%1$d%%</string>
+    <string name="wind_speed_label">Angin\n%1$.1f km/h</string>
+    <string name="rain_prob_label">Hujan\n%1$d%%</string>
+    <string name="btn_bring_in">Masukkan\nJemuran</string>
+    <string name="btn_take_out">Keluarkan\nJemuran</string>
+    <string name="automation_title">Otomatisasi Komprehensif</string>
+    <string name="status_active">AKTIF</string>
+    <string name="status_laundry_title">Status Jemuran</string>
+    <string name="status_wet">Jemuran Basah</string>
+    <string name="status_safe">Jemuran Aman</string>
+    <string name="location_outside">DI LUAR</string>
+    <string name="location_inside">DI DALAM</string>
+    <string name="dryness_percentage_title">Persentase Kering</string>
+    <string name="stats_today_title">Statistik Hari Ini</string>
+    <string name="total_drying_time_title">Total Waktu Jemuran</string>
+    <string name="rain_count_label">Hujan: %1$d kali</string>
+    <string name="nav_home">Beranda</string>
+    <string name="nav_history">Riwayat</string>
+    <string name="nav_settings">Pengaturan</string>
+    <string name="nav_profile">Profil</string>
+
+    <!-- Login -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="login_subtitle">Masuk ke akun RainSafe Anda</string>
+    <string name="label_email">Email</string>
+    <string name="phone_otp">Phone + OTP</string>
+    <string name="email_address">Email Address</string>
+    <string name="hint_email">andi@gmail.com</string>
+    <string name="label_password">Password</string>
+    <string name="hint_password">12345678</string>
+    <string name="remember_me">Ingat saya di perangkat ini</string>
+    <string name="btn_login">Login</string>
+    <string name="forgot_password_q">Lupa Password?</string>
+    <string name="no_account_register">Belum punya akun? Daftar di sini</string>
+
+    <!-- Register -->
+    <string name="register_title">Buat Akun Baru</string>
+    <string name="register_subtitle">Daftar untuk menggunakan RainSafe</string>
+    <string name="label_full_name">Nama Lengkap</string>
+    <string name="hint_full_name">Ahmad Ridho</string>
+    <string name="label_phone">Nomor Telepon</string>
+    <string name="hint_phone">+62 812-3456-7890</string>
+    <string name="hint_reg_password">Pelangi.1</string>
+    <string name="password_requirement">Minimal 8 karakter, campuran huruf besar dan kecil</string>
+    <string name="label_confirm_password">Konfirmasi Password</string>
+    <string name="hint_confirm_password">Ulangi password</string>
+    <string name="terms_agreement">Saya setuju dengan Syarat &amp; Ketentuan dan Kebijakan Privasi</string>
+    <string name="btn_register">Buat Akun</string>
+    <string name="have_account_login">Sudah punya akun? Login di sini</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_password_title">Lupa Password</string>
+    <string name="forgot_password_desc">Masukkan email atau nomor telepon Anda untuk mengatur ulang password</string>
+    <string name="email_phone_label">Email / Nomor Telepon</string>
+    <string name="email_phone_hint">contoh@gmail.com atau +62...</string>
+    <string name="btn_send_instructions">Kirim Instruksi</string>
+    <string name="back_to_login">Kembali ke Login</string>
+</resources>

@@ -30,6 +30,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
+                android:contentDescription="@string/desc_logo"
                 android:src="@drawable/ic_cloud" />
         </FrameLayout>
 
@@ -38,18 +39,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="sans-serif-black"
-            android:text="RainSafe"
+            android:text="@string/app_name"
             android:textColor="@color/text_dark"
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Smart Laundry Control"
-            android:textColor="@color/text_gray"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/smart_laundry_control"
+                android:textColor="@color/text_gray"
+                android:textSize="14sp" />
     </LinearLayout>
 
     <!-- Center Content Section -->
@@ -73,6 +74,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
+                android:contentDescription="@string/desc_weather_icon"
                 android:src="@drawable/ic_sun" />
         </FrameLayout>
 
@@ -80,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Deteksi Hujan Cerdas"
+            android:text="@string/title_smart_detection"
             android:textColor="@color/text_dark"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -91,7 +93,7 @@
             android:layout_marginTop="12dp"
             android:gravity="center"
             android:paddingHorizontal="40dp"
-            android:text="Sensor otomatis masukkan jemuran saat hujan terdeteksi"
+            android:text="@string/desc_smart_detection"
             android:textColor="@color/text_gray"
             android:textSize="14sp" />
     </LinearLayout>
@@ -152,7 +154,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_rounded_white"
-                android:text="Skip"
+                android:text="@string/btn_skip"
                 android:textAllCaps="false"
                 android:textColor="@color/text_gray"
                 app:backgroundTint="@null" />
@@ -166,10 +168,11 @@
                 android:background="@drawable/bg_rounded_blue"
                 android:drawableEnd="@drawable/ic_arrow_next"
                 android:paddingEnd="16dp"
-                android:text="Next"
+                android:text="@string/btn_next"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                app:backgroundTint="@null" />
+                app:backgroundTint="@null"
+                tools:ignore="RtlSymmetry" />
         </LinearLayout>
     </LinearLayout>
 

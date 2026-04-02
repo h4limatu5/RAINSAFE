@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_blue_bg">
@@ -10,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:text="Welcome Back"
+        android:text="@string/welcome_back"
         android:textColor="@color/text_dark"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -23,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Masuk ke akun RainSafe Anda"
+        android:text="@string/login_subtitle"
         android:textColor="@color/text_gray"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,32 +53,40 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/tabEmail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        tools:ignore="UseCompoundDrawables">
                         <ImageView
+                            android:id="@+id/ivEmailTab"
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:src="@drawable/ic_email"
-                            app:tint="@color/primary_blue" />
+                            app:tint="@color/primary_blue"
+                            android:contentDescription="@string/label_email" />
                         <TextView
+                            android:id="@+id/tvEmailTab"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="Email"
+                            android:text="@string/label_email"
                             android:textColor="@color/primary_blue"
                             android:textStyle="bold" />
                     </LinearLayout>
 
                     <View
+                        android:id="@+id/indicatorEmail"
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:layout_marginTop="8dp"
@@ -85,19 +94,24 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/tabPhone"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
+                        android:id="@+id/tvPhoneTab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Phone + OTP"
+                        android:text="@string/phone_otp"
                         android:textColor="@color/text_gray" />
 
                     <View
+                        android:id="@+id/indicatorPhone"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="8dp"
@@ -105,80 +119,188 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Email Field -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Email Address"
-                android:textColor="@color/text_dark"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
+            <!-- Email Form Section -->
             <LinearLayout
+                android:id="@+id/formEmail"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_rounded_white"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="12dp">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_email" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/email_address"
+                    android:textColor="@color/text_dark"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/etEmail"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="12dp"
-                    android:background="@android:color/transparent"
-                    android:hint="andi@gmail.com"
-                    android:inputType="textEmailAddress"
-                    android:textSize="14sp" />
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_white"
+                    android:backgroundTint="#F0F7FF"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_email"
+                        android:contentDescription="@string/label_email" />
+
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_email"
+                        android:inputType="textEmailAddress"
+                        android:textSize="14sp"
+                        android:importantForAutofill="no" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/label_password"
+                    android:textColor="@color/text_dark"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_white"
+                    android:backgroundTint="#F0F7FF"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_lock"
+                        android:contentDescription="@string/label_password" />
+
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_password"
+                        android:inputType="textPassword"
+                        android:textSize="14sp"
+                        android:importantForAutofill="no" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_arrow_next"
+                        android:rotation="0"
+                        app:tint="@color/text_gray"
+                        android:contentDescription="" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- Password Field -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Password"
-                android:textColor="@color/text_dark"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
+            <!-- Phone + OTP Form Section (Hidden by default) -->
             <LinearLayout
+                android:id="@+id/formPhone"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="8dp"
-                android:background="#F0F7FF"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="12dp">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_lock" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/label_phone_number"
+                    android:textColor="@color/text_dark"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/etPassword"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:hint="12345678"
-                    android:inputType="textPassword"
-                    android:textSize="14sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_white"
+                    android:backgroundTint="#F0F7FF"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_arrow_next"
-                    android:rotation="0"
-                    app:tint="@color/text_gray" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_phone"
+                        android:contentDescription="@string/label_phone_number" />
+
+                    <EditText
+                        android:id="@+id/etPhone"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_phone_number"
+                        android:inputType="phone"
+                        android:textSize="14sp"
+                        android:importantForAutofill="no" />
+
+                    <TextView
+                        android:id="@+id/btnSendOTP"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KIRIM"
+                        android:textColor="@color/primary_blue"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/label_otp"
+                    android:textColor="@color/text_dark"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_white"
+                    android:backgroundTint="#F0F7FF"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_lock"
+                        android:contentDescription="@string/label_otp" />
+
+                    <EditText
+                        android:id="@+id/etOTP"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_otp"
+                        android:inputType="number"
+                        android:maxLength="6"
+                        android:textSize="14sp"
+                        android:importantForAutofill="no" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Remember Me -->
@@ -186,7 +308,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Ingat saya di perangkat ini"
+                android:text="@string/remember_me"
                 android:textColor="@color/text_gray"
                 android:textSize="12sp"
                 android:buttonTint="@color/primary_blue"/>
@@ -198,7 +320,7 @@
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_rounded_blue"
-                android:text="Login"
+                android:text="@string/btn_login"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
@@ -211,7 +333,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="Lupa Password?"
+                android:text="@string/forgot_password_q"
                 android:textColor="@color/primary_blue"
                 android:textSize="13sp" />
 
@@ -221,7 +343,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="24dp"
-                android:text="Belum punya akun? Daftar di sini"
+                android:text="@string/no_account_register"
                 android:textColor="@color/text_gray"
                 android:textSize="13sp" />
 

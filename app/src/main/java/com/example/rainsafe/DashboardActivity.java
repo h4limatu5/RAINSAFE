@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.rainsafe.data.AppDatabase;
 import com.example.rainsafe.data.entity.Device;
@@ -26,15 +24,14 @@ import java.util.concurrent.Executors;
 public class DashboardActivity extends AppCompatActivity {
 
     private TextView tvTemperature, tvWeatherDesc, tvHumidity, tvWindSpeed, tvRainProbability;
-    private TextView tvDeviceStatus, tvCoverStatus, tvDrynessText, tvTotalUsageToday, tvRainCount;
-    private ProgressBar pbDryness;
-    private ImageView ivWeatherIcon, ivStatusIcon;
+    private TextView tvDeviceStatus, tvCoverStatus, tvDrynessText, tvTotalUsageToday, tvRainCountLarge;
+    private TextView tvAvgHumidity;
+    private ProgressBar pbDryness, pbAvgHumidity;
     private SwitchCompat switchAutomation;
     private Button btnMasukan, btnKeluarkan;
-    private LinearLayout navHistory, navSettings, navProfile;
     
     private AppDatabase db;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +47,7 @@ public class DashboardActivity extends AppCompatActivity {
         btnKeluarkan.setOnClickListener(v -> updateCoverStatus(false));
         
         switchAutomation.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) { // Hanya trigger jika diubah oleh user
+            if (buttonView.isPressed()) { 
                 executorService.execute(() -> {
                     Device device = db.deviceDao().getDeviceById(1);
                     if (device != null) {
@@ -72,25 +69,20 @@ public class DashboardActivity extends AppCompatActivity {
         tvDeviceStatus = findViewById(R.id.tvDeviceStatus);
         tvCoverStatus = findViewById(R.id.tvCoverStatus);
         tvDrynessText = findViewById(R.id.tvDrynessText);
+        
         tvTotalUsageToday = findViewById(R.id.tvTotalUsageToday);
-        tvRainCount = findViewById(R.id.tvRainCount);
+        tvRainCountLarge = findViewById(R.id.tvRainCountLarge);
+        tvAvgHumidity = findViewById(R.id.tvAvgHumidity);
         
         pbDryness = findViewById(R.id.pbDryness);
-        ivWeatherIcon = findViewById(R.id.ivWeatherIcon);
-        // ivStatusIcon di layout baru mungkin sama dengan ivWeatherIcon atau berada di card status
-        // Di XML dashboard saya menaruh ivWeatherIcon di bagian cuaca.
+        pbAvgHumidity = findViewById(R.id.pbAvgHumidity);
         
         switchAutomation = findViewById(R.id.switchAutomation);
         btnMasukan = findViewById(R.id.btnMasukan);
         btnKeluarkan = findViewById(R.id.btnKeluarkan);
-        
-        navHistory = findViewById(R.id.navHistory);
-        navSettings = findViewById(R.id.navSettings);
-        navProfile = findViewById(R.id.navProfile);
     }
 
     private void observeDeviceData() {
-        // Observe data dari DB secara real-time
         db.deviceDao().getDeviceLiveData(1).observe(this, device -> {
             if (device != null) {
                 updateUI(device);
@@ -101,26 +93,33 @@ public class DashboardActivity extends AppCompatActivity {
     private void updateUI(Device device) {
         // Update Cuaca
         tvTemperature.setText(String.format(Locale.getDefault(), "%.0f°C", device.getTemperature()));
-        tvHumidity.setText("Kelembaban\n" + device.getHumidity() + "%");
-        tvWindSpeed.setText("Angin\n" + device.getWindSpeed() + " km/h");
-        tvRainProbability.setText("Hujan\n" + device.getRainProbability() + "%");
+        tvWeatherDesc.setText(getString(R.string.default_weather_desc));
+        tvHumidity.setText(getString(R.string.humidity_label, device.getHumidity()));
+        tvWindSpeed.setText(getString(R.string.wind_speed_label, device.getWindSpeed()));
+        tvRainProbability.setText(getString(R.string.rain_prob_label, device.getRainProbability()));
 
         // Update Status Atap
         if (device.isClosed()) {
-            tvDeviceStatus.setText("Jemuran Aman");
-            tvCoverStatus.setText("DI DALAM");
-            tvCoverStatus.setBackgroundResource(R.drawable.bg_rounded_blue); // Gunakan warna biru/merah muda
-            tvCoverStatus.setTextColor(getResources().getColor(R.color.white));
+            tvDeviceStatus.setText(getString(R.string.status_safe));
+            tvCoverStatus.setText(getString(R.string.location_inside));
+            tvCoverStatus.setBackgroundResource(R.drawable.bg_rounded_blue);
+            tvCoverStatus.setTextColor(ContextCompat.getColor(this, R.color.white));
         } else {
-            tvDeviceStatus.setText("Jemuran Basah");
-            tvCoverStatus.setText("DI LUAR");
-            tvCoverStatus.setBackgroundColor(0xFFE8F5E9); // Hijau muda
-            tvCoverStatus.setTextColor(getResources().getColor(R.color.green_status));
+            tvDeviceStatus.setText(getString(R.string.status_wet));
+            tvCoverStatus.setText(getString(R.string.location_outside));
+            tvCoverStatus.setBackgroundResource(R.drawable.bg_rounded_light_blue);
+            tvCoverStatus.setTextColor(ContextCompat.getColor(this, R.color.green_status));
         }
 
         // Update Progress Kering
         pbDryness.setProgress(device.getDrynessPercentage());
-        tvDrynessText.setText(device.getDrynessPercentage() + "%");
+        tvDrynessText.setText(String.format(Locale.getDefault(), "%d%%", device.getDrynessPercentage()));
+        
+        // Update Statistik sesuai gambar
+        tvTotalUsageToday.setText("6 jam 10 menit"); 
+        tvAvgHumidity.setText(String.format(Locale.getDefault(), "%d%%", device.getHumidity() - 3));
+        pbAvgHumidity.setProgress(device.getHumidity() - 3);
+        tvRainCountLarge.setText(getString(R.string.rain_count_label, 0).replace("Hujan: ", ""));
         
         // Update Toggle
         switchAutomation.setChecked(device.isAutomationActive());
@@ -152,5 +151,11 @@ public class DashboardActivity extends AppCompatActivity {
             History history = new History(title, desc, currentTime, "Manual");
             db.historyDao().insert(history);
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 }

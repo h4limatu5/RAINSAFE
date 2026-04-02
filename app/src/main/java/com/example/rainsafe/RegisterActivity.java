@@ -1,7 +1,6 @@
 package com.example.rainsafe;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -20,10 +19,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText etUsername, etEmail, etPhone, etPassword, etConfirmPassword;
     private CheckBox cbTerms;
-    private Button btnRegister;
-    private TextView tvBackToLogin;
     private AppDatabase db;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,49 +35,47 @@ public class RegisterActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etRegPassword);
         etConfirmPassword = findViewById(R.id.etRegConfirmPassword);
         cbTerms = findViewById(R.id.cbTerms);
-        btnRegister = findViewById(R.id.btnRegister);
-        tvBackToLogin = findViewById(R.id.tvBackToLogin);
+        Button btnRegister = findViewById(R.id.btnRegister);
+        TextView tvBackToLogin = findViewById(R.id.tvBackToLogin);
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String username = etUsername.getText().toString();
-                String email = etEmail.getText().toString();
-                String phone = etPhone.getText().toString();
-                String password = etPassword.getText().toString();
-                String confirmPassword = etConfirmPassword.getText().toString();
+        btnRegister.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String phone = etPhone.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-                if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                    Toast.makeText(RegisterActivity.this, "Harap isi semua bidang", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(RegisterActivity.this, getString(R.string.err_empty_fields), Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                if (!password.equals(confirmPassword)) {
-                    Toast.makeText(RegisterActivity.this, "Password tidak cocok", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(RegisterActivity.this, getString(R.string.err_password_mismatch), Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                if (!cbTerms.isChecked()) {
-                    Toast.makeText(RegisterActivity.this, "Anda harus menyetujui Syarat & Ketentuan", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if (!cbTerms.isChecked()) {
+                Toast.makeText(RegisterActivity.this, getString(R.string.err_terms_not_accepted), Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                executorService.execute(() -> {
-                    User newUser = new User(username, email, phone, password, "");
-                    db.userDao().insert(newUser);
-                    runOnUiThread(() -> {
-                        Toast.makeText(RegisterActivity.this, "Pendaftaran berhasil!", Toast.LENGTH_SHORT).show();
-                        finish();
-                    });
+            executorService.execute(() -> {
+                User newUser = new User(username, email, phone, password, "");
+                db.userDao().insert(newUser);
+                runOnUiThread(() -> {
+                    Toast.makeText(RegisterActivity.this, getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show();
+                    finish();
                 });
-            }
+            });
         });
 
-        tvBackToLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        tvBackToLogin.setOnClickListener(v -> finish());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 }

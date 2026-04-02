@@ -16,11 +16,10 @@ import java.util.concurrent.Executors;
 public class SettingsActivity extends AppCompatActivity {
 
     private SwitchCompat switchModeOtomatis, switchModeMalam, switchSensorHujan, switchSensorCahaya;
-    private SwitchCompat switchNotifHujan, switchNotifJemuran, switchNotifError, switchDarkMode;
-    private TextView tvSensitivitasHujan, tvDelayRespon, tvDeviceStatus, tvBahasa;
+    private TextView tvSensitivitasHujan, tvDelayRespon, tvDeviceStatus;
     
     private AppDatabase db;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +38,10 @@ public class SettingsActivity extends AppCompatActivity {
         switchModeMalam = findViewById(R.id.switchModeMalam);
         switchSensorHujan = findViewById(R.id.switchSensorHujan);
         switchSensorCahaya = findViewById(R.id.switchSensorCahaya);
-        switchNotifHujan = findViewById(R.id.switchNotifHujan);
-        switchNotifJemuran = findViewById(R.id.switchNotifJemuran);
-        switchNotifError = findViewById(R.id.switchNotifError);
-        switchDarkMode = findViewById(R.id.switchDarkMode);
 
         tvSensitivitasHujan = findViewById(R.id.tvSensitivitasHujan);
         tvDelayRespon = findViewById(R.id.tvDelayRespon);
         tvDeviceStatus = findViewById(R.id.tvDeviceStatus);
-        tvBahasa = findViewById(R.id.tvBahasa);
     }
 
     private void observeDeviceData() {
@@ -59,32 +53,40 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void updateUI(Device device) {
-        switchModeOtomatis.setChecked(device.isAutomationActive());
-        switchModeMalam.setChecked(device.isNightMode());
-        switchSensorHujan.setChecked(device.isRainSensorActive());
-        switchSensorCahaya.setChecked(device.isLightSensorActive());
+        if (switchModeOtomatis != null) switchModeOtomatis.setChecked(device.isAutomationActive());
+        if (switchModeMalam != null) switchModeMalam.setChecked(device.isNightMode());
+        if (switchSensorHujan != null) switchSensorHujan.setChecked(device.isRainSensorActive());
+        if (switchSensorCahaya != null) switchSensorCahaya.setChecked(device.isLightSensorActive());
         
-        tvSensitivitasHujan.setText(device.getRainSensitivity());
-        tvDelayRespon.setText(device.getResponseDelay() + " detik");
-        tvDeviceStatus.setText("• " + device.getStatus());
+        if (tvSensitivitasHujan != null) tvSensitivitasHujan.setText(device.getRainSensitivity());
+        if (tvDelayRespon != null) tvDelayRespon.setText(getString(R.string.val_5_seconds));
+        if (tvDeviceStatus != null) tvDeviceStatus.setText(getString(R.string.status_online_bullet));
     }
 
     private void setupListeners() {
-        switchModeOtomatis.setOnCheckedChangeListener((v, isChecked) -> {
-            if (v.isPressed()) updateDeviceField("automationActive", isChecked);
-        });
+        if (switchModeOtomatis != null) {
+            switchModeOtomatis.setOnCheckedChangeListener((v, isChecked) -> {
+                if (v.isPressed()) updateDeviceField("automationActive", isChecked);
+            });
+        }
         
-        switchModeMalam.setOnCheckedChangeListener((v, isChecked) -> {
-            if (v.isPressed()) updateDeviceField("nightMode", isChecked);
-        });
+        if (switchModeMalam != null) {
+            switchModeMalam.setOnCheckedChangeListener((v, isChecked) -> {
+                if (v.isPressed()) updateDeviceField("nightMode", isChecked);
+            });
+        }
 
-        switchSensorHujan.setOnCheckedChangeListener((v, isChecked) -> {
-            if (v.isPressed()) updateDeviceField("rainSensorActive", isChecked);
-        });
+        if (switchSensorHujan != null) {
+            switchSensorHujan.setOnCheckedChangeListener((v, isChecked) -> {
+                if (v.isPressed()) updateDeviceField("rainSensorActive", isChecked);
+            });
+        }
 
-        switchSensorCahaya.setOnCheckedChangeListener((v, isChecked) -> {
-            if (v.isPressed()) updateDeviceField("lightSensorActive", isChecked);
-        });
+        if (switchSensorCahaya != null) {
+            switchSensorCahaya.setOnCheckedChangeListener((v, isChecked) -> {
+                if (v.isPressed()) updateDeviceField("lightSensorActive", isChecked);
+            });
+        }
     }
 
     private void updateDeviceField(String field, boolean value) {
@@ -115,5 +117,11 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(new Intent(this, ProfileActivity.class));
             finish();
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 }

@@ -64,19 +64,19 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void updateDeviceUI(Device device) {
         if (tvDeviceName != null) tvDeviceName.setText(device.getName());
-        if (tvStatus != null) tvStatus.setText("• " + device.getStatus());
+        if (tvStatus != null) tvStatus.setText(getString(R.string.status_online_bullet));
         if (tvLocation != null) tvLocation.setText(device.getLocation());
         if (tvFirmware != null) tvFirmware.setText(device.getFirmware());
         
         if (tvLastStatus != null) {
-            tvLastStatus.setText(device.isClosed() ? "Jemuran Di Dalam" : "Jemuran Di Luar");
+            tvLastStatus.setText(device.isClosed() ? getString(R.string.location_inside) : getString(R.string.location_outside));
         }
     }
 
     private void updateUserUI(User user) {
         if (tvProfileName != null) tvProfileName.setText(user.getFullName());
         if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
-        if (tvTotalUsage != null) tvTotalUsage.setText(user.getTotalUsageHours() + " jam");
+        if (tvTotalUsage != null) tvTotalUsage.setText(getString(R.string.val_total_usage));
         if (tvLastUsed != null) tvLastUsed.setText(user.getLastUsed());
     }
 
