@@ -72,4 +72,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return success;
     }
+
+    // Method to update password (Forgot Password)
+    public boolean updatePassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_PASSWORD, newPassword);
+
+        int result = db.update(TABLE_USERS, contentValues, COLUMN_EMAIL + " = ?", new String[]{email});
+        return result > 0;
+    }
 }

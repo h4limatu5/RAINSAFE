@@ -40,6 +40,18 @@
     <string name="login_no_account">Belum punya akun? </string>
     <string name="login_register_here">Daftar di sini</string>
 
+    <!-- Forgot Password Screen -->
+    <string name="forgot_title">Lupa Password</string>
+    <string name="forgot_subtitle">Masukkan email terdaftar untuk mereset password</string>
+    <string name="forgot_label_email">Email Address</string>
+    <string name="forgot_hint_email">andi@gmail.com</string>
+    <string name="forgot_label_new_password">Password Baru</string>
+    <string name="forgot_hint_new_password">Min 8 karakter</string>
+    <string name="forgot_button">Reset Password</string>
+    <string name="forgot_back_to_login">Kembali ke Login</string>
+    <string name="msg_reset_success">Password berhasil diubah</string>
+    <string name="msg_reset_failed">Reset gagal. Email tidak ditemukan.</string>
+
     <!-- Register Screen -->
     <string name="register_title">Buat Akun Baru</string>
     <string name="register_subtitle">Daftar untuk menggunakan RainSafe</string>
@@ -123,6 +135,25 @@
     <string name="hist_2days_ago">2 HARI LALU</string>
     <string name="hist_load_more">MUAT LEBIH BANYAK</string>
 
+    <!-- History Items -->
+    <string name="hist_item_out_title">Jemuran Dikeluarkan</string>
+    <string name="hist_item_out_desc">Status berubah dari \'Dalam\' ke \'Luar\'. Otomatis</string>
+    <string name="hist_item_auto_active">Mode Otomatisasi Aktif!</string>
+    <string name="hist_item_auto_desc">Sistem aktivitas otomatis diaktifkan oleh pengguna</string>
+    <string name="hist_item_rain_detected">Hujan Terdeteksi</string>
+    <string name="hist_item_rain_desc">Sensor hujan mendeteksi cuaca. Intensitas sedang (52%)</string>
+    <string name="hist_item_in_auto">Jemuran Masuk Otomatis</string>
+    <string name="hist_item_in_desc">Jemuran ditarik ke dalam karena terdeteksi hujan</string>
+    <string name="hist_item_out_manual">Jemuran ditarik keluar setelah sebelumnya dikeringkan</string>
+    <string name="hist_item_sensor_light">Sensor Cahaya Aktif</string>
+    <string name="hist_item_sensor_desc">Sensor pencahayaan dalam kondisi normal (82%)</string>
+    <string name="hist_item_morning_out">Pagi hari. Cuaca cerah, kelembaban 45%</string>
+
+    <!-- Badges -->
+    <string name="badge_auto">Otomatis</string>
+    <string name="badge_manual">Manual</string>
+    <string name="badge_system">Sistem</string>
+
     <!-- Profile Screen (New) -->
     <string name="profile_name">Ahmad Ridho</string>
     <string name="profile_email">ahmad.ridho@email.com</string>
@@ -148,4 +179,15 @@
     <string name="nav_history">Riwayat</string>
     <string name="nav_settings">Pengaturan</string>
     <string name="nav_profile">Profil</string>
+
+    <!-- Login Messages -->
+    <string name="error_empty_fields">Harap isi email dan password</string>
+    <string name="msg_forgot_password_unavailable">Fitur Lupa Password belum tersedia</string>
+
+    <!-- Register Messages -->
+    <string name="error_all_fields_required">Harap isi semua field</string>
+    <string name="error_password_mismatch">Password tidak cocok</string>
+    <string name="error_email_exists">Email sudah terdaftar</string>
+    <string name="msg_register_success">Pendaftaran Berhasil! Silakan Login</string>
+    <string name="error_register_failed">Pendaftaran Gagal. Coba lagi.</string>
 </resources>

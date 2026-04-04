@@ -17,11 +17,14 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private TextView tvForgotPassword;
     private TextView tvRegister;
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        dbHelper = new DatabaseHelper(this);
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
@@ -32,16 +35,20 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = etEmail.getText().toString();
-                String password = etPassword.getText().toString();
+                String email = etEmail.getText().toString().trim();
+                String password = etPassword.getText().toString().trim();
 
                 if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Harap isi email dan password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show();
                 } else {
-                    // Berhasil login, pindah ke Dashboard
-                    Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                    startActivity(intent);
-                    finish();
+                    if (dbHelper.checkLogin(email, password)) {
+                        // Berhasil login, pindah ke Dashboard
+                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Email atau Password salah", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -49,7 +56,8 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Fitur Lupa Password belum tersedia", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
             }
         });
 
