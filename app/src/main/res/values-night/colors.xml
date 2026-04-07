@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#FF121212</color>
+    <color name="bg_blue">#1A2B3C</color>
+    <color name="button_blue">#3A8CC2</color>
+    <color name="button_orange">#C2832A</color>
+    <color name="input_bg">#2C3E50</color>
+    <color name="card_white">#1E1E1E</color>
+    <color name="text_grey">#B0B0B0</color>
+    <color name="status_green">#81C784</color>
+    <color name="progress_blue">#3A8CC2</color>
+    <color name="posisi_box_bg">#253545</color>
+    <color name="progress_yellow">#FFD54F</color>
+    <color name="card_shadow">#40000000</color>
+    <color name="bg_welcome_outer">#212121</color>
+    <color name="bg_welcome_card">#121212</color>
+    <color name="bg_dashboard">#121212</color>
+    <color name="dot_active">#3A8CC2</color>
+    <color name="dot_inactive">#455A64</color>
+    <color name="tab_active">#82B1FF</color>
+    <color name="tab_inactive">#B0B0B0</color>
+    <color name="tab_line_inactive">#333333</color>
+</resources>

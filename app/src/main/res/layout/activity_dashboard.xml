@@ -86,18 +86,36 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/btnNotifications"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:cardBackgroundColor="#DCEEFA"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
-                <ImageView
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_notifications"
-                    android:contentDescription="@null"
-                    app:tint="@color/button_blue" />
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_notifications"
+                        android:contentDescription="@null"
+                        app:tint="@color/button_blue" />
+
+                    <View
+                        android:id="@+id/notificationDot"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/indicator_active"
+                        android:backgroundTint="#FF5252"
+                        android:visibility="gone" />
+                </RelativeLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -235,6 +253,7 @@
                                         android:textColor="@color/text_grey"
                                         android:textSize="10sp" />
                                     <TextView
+                                        android:id="@+id/tvHumidityVal"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/dash_val_humidity"
@@ -310,6 +329,7 @@
                                         android:textColor="@color/text_grey"
                                         android:textSize="10sp" />
                                     <TextView
+                                        android:id="@+id/tvRainProbVal"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/dash_val_rain_prob"
@@ -720,6 +740,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tvAvgHumVal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/dash_stats_val_avg_hum"
@@ -728,6 +749,7 @@
                         android:textStyle="bold" />
 
                     <ProgressBar
+                        android:id="@+id/pbAvgHum"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_height="6dp"
@@ -847,6 +869,7 @@
                                     android:textColor="@color/black"
                                     android:textStyle="bold" />
                                 <TextView
+                                    android:id="@+id/tvSensorRainStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:drawablePadding="4dp"
@@ -897,6 +920,7 @@
                                     android:textColor="@color/black"
                                     android:textStyle="bold" />
                                 <TextView
+                                    android:id="@+id/tvSensorLightStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:drawablePadding="4dp"
@@ -946,6 +970,7 @@
                                     android:textColor="@color/black"
                                     android:textStyle="bold" />
                                 <TextView
+                                    android:id="@+id/tvSensorHumStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:drawablePadding="4dp"

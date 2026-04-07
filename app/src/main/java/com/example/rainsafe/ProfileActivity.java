@@ -18,11 +18,23 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView ivActiveIcon;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
+    private TextView tvProfileName, tvProfileEmail, tvProfilePhone;
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        dbHelper = new DatabaseHelper(this);
+
+        // Initialize Profile Views
+        tvProfileName = findViewById(R.id.tvProfileName);
+        tvProfileEmail = findViewById(R.id.tvProfileEmail);
+        tvProfilePhone = findViewById(R.id.tvProfilePhone);
+
+        // Load User Data
+        loadUserData();
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
@@ -49,19 +61,28 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Navigation Listeners
         navHome.setOnClickListener(v -> {
-            startActivity(new Intent(this, DashboardActivity.class));
+            Intent intent = new Intent(this, DashboardActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
         
         navHistory.setOnClickListener(v -> {
-            startActivity(new Intent(this, HistoryActivity.class));
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
 
         navSettings.setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
@@ -72,6 +93,28 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(new Intent(this, LoginActivity.class));
             finishAffinity();
         });
+    }
+
+    private void loadUserData() {
+        String identifier = getIntent().getStringExtra("USER_IDENTIFIER");
+        String loginType = getIntent().getStringExtra("LOGIN_TYPE");
+
+        if (identifier != null && loginType != null) {
+            java.util.Map<String, String> userData;
+            if (loginType.equals("email")) {
+                userData = dbHelper.getUserData(identifier);
+            } else {
+                userData = dbHelper.getUserDataByPhone(identifier);
+            }
+
+            if (!userData.isEmpty()) {
+                tvProfileName.setText(userData.get("fullname"));
+                tvProfileEmail.setText(userData.get("email"));
+                if (tvProfilePhone != null) {
+                    tvProfilePhone.setText(userData.get("phone"));
+                }
+            }
+        }
     }
 
     private void moveIndicator(int position) {

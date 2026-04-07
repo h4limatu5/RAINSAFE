@@ -2,13 +2,19 @@ package com.example.rainsafe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+
+import java.util.Map;
+import java.util.Random;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -19,12 +25,25 @@ public class DashboardActivity extends AppCompatActivity {
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
 
+    // Real-time Views
+    private TextView tvHumidityVal, tvRainProbVal, tvAvgHumVal;
+    private TextView tvSensorRainStatus, tvSensorLightStatus, tvSensorHumStatus;
+    private ProgressBar pbAvgHum;
+    private View notificationDot;
+    private boolean isRaining = false;
+
+    private DatabaseHelper dbHelper;
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable updateRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // Initialize Views
+        dbHelper = new DatabaseHelper(this);
+
+        // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
         navHistory = findViewById(R.id.navHistory);
         navSettings = findViewById(R.id.navSettings);
@@ -44,6 +63,21 @@ public class DashboardActivity extends AppCompatActivity {
         tvSettings = findViewById(R.id.tvSettings);
         tvProfile = findViewById(R.id.tvProfile);
 
+        // Initialize Real-time Views
+        tvHumidityVal = findViewById(R.id.tvHumidityVal);
+        tvRainProbVal = findViewById(R.id.tvRainProbVal);
+        tvAvgHumVal = findViewById(R.id.tvAvgHumVal);
+        pbAvgHum = findViewById(R.id.pbAvgHum);
+        tvSensorRainStatus = findViewById(R.id.tvSensorRainStatus);
+        tvSensorLightStatus = findViewById(R.id.tvSensorLightStatus);
+        tvSensorHumStatus = findViewById(R.id.tvSensorHumStatus);
+        notificationDot = findViewById(R.id.notificationDot);
+
+        findViewById(R.id.btnNotifications).setOnClickListener(v -> {
+            notificationDot.setVisibility(View.GONE);
+            // Optional: open notification list
+        });
+
         // Set Default Position (Home - 0)
         activeIndicator.post(() -> moveIndicator(0));
 
@@ -62,11 +96,97 @@ public class DashboardActivity extends AppCompatActivity {
             finish();
         });
 
+        // Handle user navigation with profile data
         navProfile.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
+
+        // Setup Real-time Updates
+        setupRealTimeUpdates();
+    }
+
+    private void setupRealTimeUpdates() {
+        updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateSensorUI();
+                // Schedule next update in 3 seconds
+                handler.postDelayed(this, 3000);
+            }
+        };
+        handler.post(updateRunnable);
+    }
+
+    private void updateSensorUI() {
+        // Fetch from Database
+        Map<String, String> rainData = dbHelper.getLatestSensorData("Sensor Hujan");
+        Map<String, String> lightData = dbHelper.getLatestSensorData("Sensor Cahaya");
+        Map<String, String> humData = dbHelper.getLatestSensorData("Sensor Kelembaban");
+
+        if (!humData.isEmpty()) {
+            String val = humData.get("value") + humData.get("unit");
+            tvHumidityVal.setText(val);
+            tvAvgHumVal.setText(val);
+            tvSensorHumStatus.setText("aktif (" + val + ")");
+            try {
+                pbAvgHum.setProgress(Integer.parseInt(humData.get("value")));
+            } catch (Exception ignored) {}
+        }
+
+        if (!rainData.isEmpty()) {
+            tvRainProbVal.setText(rainData.get("value") + rainData.get("unit"));
+            String currentStatus = rainData.get("status");
+            tvSensorRainStatus.setText(currentStatus);
+            
+            // Real-time Notification logic
+            if (currentStatus.equalsIgnoreCase("Hujan") && !isRaining) {
+                isRaining = true;
+                showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran ditarik otomatis.");
+            } else if (currentStatus.equalsIgnoreCase("Aman") || currentStatus.equalsIgnoreCase("Cerah")) {
+                isRaining = false;
+            }
+        }
+
+        if (!lightData.isEmpty()) {
+            tvSensorLightStatus.setText(lightData.get("status"));
+        }
+    }
+
+    private void showNotificationAlert(String title, String message) {
+        // Show Red Dot
+        notificationDot.setVisibility(View.VISIBLE);
+        
+        // Android System Notification (Optional but good for real-time feel)
+        androidx.core.app.NotificationCompat.Builder builder = new androidx.core.app.NotificationCompat.Builder(this, "RAINSAFE_NOTIF")
+                .setSmallIcon(R.drawable.ic_notifications)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        android.app.NotificationManager notificationManager = (android.app.NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        
+        // Create channel for Android O+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            android.app.NotificationChannel channel = new android.app.NotificationChannel("RAINSAFE_NOTIF", "RainSafe Alerts", android.app.NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+        }
+        
+        notificationManager.notify(1, builder.build());
+        
+        // Toast for immediate feedback
+        android.widget.Toast.makeText(this, title + "\n" + message, android.widget.Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(updateRunnable);
     }
 
     private void moveIndicator(int position) {

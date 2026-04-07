@@ -162,6 +162,13 @@
                         android:text="@string/profile_email"
                         android:textColor="@color/text_grey"
                         android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/tvProfilePhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+62 812-3456-7890"
+                        android:textColor="@color/text_grey"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -231,7 +238,7 @@
                             android:textSize="12sp"
                             android:textStyle="bold"
                             app:drawableStartCompat="@drawable/indicator_active"
-                            app:drawablePadding="4dp"
+                            android:drawablePadding="4dp"
                             app:drawableTint="#4CAF50" />
                     </RelativeLayout>
 
@@ -270,6 +277,13 @@
                             android:textStyle="bold" />
                     </RelativeLayout>
 
+                    <TextView
+                        android:id="@+id/tvProfilePhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+62 812-3456-7890"
+                        android:textColor="@color/text_grey"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -354,6 +368,13 @@
                             android:textStyle="bold" />
                     </RelativeLayout>
 
+                    <TextView
+                        android:id="@+id/tvProfilePhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+62 812-3456-7890"
+                        android:textColor="@color/text_grey"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
