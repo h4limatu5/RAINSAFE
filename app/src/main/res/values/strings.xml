@@ -179,6 +179,14 @@
     <string name="nav_history">Riwayat</string>
     <string name="nav_settings">Pengaturan</string>
     <string name="nav_profile">Profil</string>
+    <string name="nav_logout">Keluar</string>
+
+    <!-- Menu Screen -->
+    <string name="menu_title">Menu Utama</string>
+    <string name="menu_close">Tutup</string>
+    <string name="menu_help">Bantuan &amp; Dukungan</string>
+    <string name="menu_about">Tentang Aplikasi</string>
+    <string name="menu_version">Versi 1.0.0</string>
 
     <!-- Login Messages -->
     <string name="error_empty_fields">Harap isi email dan password</string>

@@ -73,9 +73,18 @@ public class DashboardActivity extends AppCompatActivity {
         tvSensorHumStatus = findViewById(R.id.tvSensorHumStatus);
         notificationDot = findViewById(R.id.notificationDot);
 
+        findViewById(R.id.btnRefresh).setOnClickListener(v -> updateSensorUI());
+
+        findViewById(R.id.btnMenu).setOnClickListener(v -> {
+            Intent intent = new Intent(this, MenuActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
+        });
+
         findViewById(R.id.btnNotifications).setOnClickListener(v -> {
             notificationDot.setVisibility(View.GONE);
-            // Optional: open notification list
+            startActivity(new Intent(this, NotificationsActivity.class));
         });
 
         // Set Default Position (Home - 0)
@@ -146,7 +155,11 @@ public class DashboardActivity extends AppCompatActivity {
             // Real-time Notification logic
             if (currentStatus.equalsIgnoreCase("Hujan") && !isRaining) {
                 isRaining = true;
+                dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran ditarik otomatis.", "rain", "ic_rainy");
                 showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran ditarik otomatis.");
+                notificationDot.setVisibility(View.VISIBLE);
+                sendEmailNotification("RainSafe: Peringatan Hujan!", 
+                    "Halo, sistem RainSafe mendeteksi hujan. Jemuran Anda telah ditarik secara otomatis untuk keamanan.");
             } else if (currentStatus.equalsIgnoreCase("Aman") || currentStatus.equalsIgnoreCase("Cerah")) {
                 isRaining = false;
             }
@@ -154,6 +167,28 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (!lightData.isEmpty()) {
             tvSensorLightStatus.setText(lightData.get("status"));
+        }
+    }
+
+    private void sendEmailNotification(String title, String message) {
+        String identifier = getIntent().getStringExtra("USER_IDENTIFIER");
+        String loginType = getIntent().getStringExtra("LOGIN_TYPE");
+        String targetEmail = "";
+
+        if ("email".equals(loginType)) {
+            targetEmail = identifier;
+        } else if (identifier != null) {
+            // Jika login via HP, ambil email dari database
+            Map<String, String> userData = dbHelper.getUserDataByPhone(identifier);
+            if (userData != null && userData.containsKey("email")) {
+                targetEmail = userData.get("email");
+            }
+        }
+
+        if (targetEmail != null && !targetEmail.isEmpty()) {
+            android.util.Log.d("RainSafe_Email", "Mengirim email ke: " + targetEmail);
+            // Toast sebagai indikasi email terkirim melalui background service simulasi
+            android.widget.Toast.makeText(this, "Email dikirim ke: " + targetEmail, android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 

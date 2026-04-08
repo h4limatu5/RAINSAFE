@@ -56,6 +56,13 @@ public class ProfileActivity extends AppCompatActivity {
         tvSettings = findViewById(R.id.tvSettings);
         tvProfile = findViewById(R.id.tvProfile);
 
+        findViewById(R.id.btnMenu).setOnClickListener(v -> {
+            Intent intent = new Intent(this, MenuActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
+        });
+
         // Set Profile as Active (Position 3)
         activeIndicator.post(() -> moveIndicator(3));
 

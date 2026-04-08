@@ -6,9 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -107,12 +110,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         addSensorData(db, "Sensor Kelembaban", "65", "%", "Aktif");
     }
 
+    public void addLog(String title, String desc, String type, String icon) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_LOG_TITLE, title);
+        values.put(COLUMN_LOG_DESC, desc);
+        values.put(COLUMN_LOG_TYPE, type);
+        values.put(COLUMN_LOG_ICON, icon);
+        values.put(COLUMN_LOG_TIME, new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date()));
+        db.insert(TABLE_LOGS, null, values);
+    }
+
     private void addLog(SQLiteDatabase db, String title, String desc, String type, String icon) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_LOG_TITLE, title);
         values.put(COLUMN_LOG_DESC, desc);
         values.put(COLUMN_LOG_TYPE, type);
         values.put(COLUMN_LOG_ICON, icon);
+        values.put(COLUMN_LOG_TIME, new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date()));
         db.insert(TABLE_LOGS, null, values);
     }
 
@@ -205,6 +220,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Map<String, String> log = new HashMap<>();
+                log.put("id", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_ID)));
                 log.put("title", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_TITLE)));
                 log.put("desc", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_DESC)));
                 log.put("time", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_TIME)));
@@ -215,6 +231,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return logs;
+    }
+
+    // Clear all logs
+    public void clearAllLogs() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_LOGS, null, null);
     }
 
     // Method to get latest sensor readings
