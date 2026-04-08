@@ -65,7 +65,8 @@ public class NotificationsActivity extends AppCompatActivity {
                     log.get("title"),
                     log.get("desc"),
                     log.get("time"),
-                    log.get("type")
+                    log.get("type"),
+                    log.get("icon")
             ));
         }
 

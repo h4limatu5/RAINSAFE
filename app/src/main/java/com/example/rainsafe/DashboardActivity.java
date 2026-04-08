@@ -94,13 +94,19 @@ public class DashboardActivity extends AppCompatActivity {
         navHome.setOnClickListener(v -> moveIndicator(0));
         
         navHistory.setOnClickListener(v -> {
-            startActivity(new Intent(this, HistoryActivity.class));
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
 
         navSettings.setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
@@ -155,7 +161,7 @@ public class DashboardActivity extends AppCompatActivity {
             // Real-time Notification logic
             if (currentStatus.equalsIgnoreCase("Hujan") && !isRaining) {
                 isRaining = true;
-                dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran ditarik otomatis.", "rain", "ic_rainy");
+                dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran ditarik otomatis.", "system", "rain");
                 showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran ditarik otomatis.");
                 notificationDot.setVisibility(View.VISIBLE);
                 sendEmailNotification("RainSafe: Peringatan Hujan!", 

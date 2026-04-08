@@ -35,12 +35,26 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvMessage.setText(notification.getMessage());
         holder.tvTime.setText(notification.getTimestamp());
 
-        if ("rain".equals(notification.getType())) {
-            holder.ivIcon.setImageResource(R.drawable.ic_rainy);
-            holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
-        } else {
-            holder.ivIcon.setImageResource(R.drawable.ic_settings);
-            holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
+        String iconType = notification.getIcon();
+        if (iconType == null) iconType = "";
+
+        switch (iconType) {
+            case "rain":
+                holder.ivIcon.setImageResource(R.drawable.ic_rainy);
+                holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
+                break;
+            case "in":
+                holder.ivIcon.setImageResource(R.drawable.ic_arrow_back);
+                holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
+                break;
+            case "out":
+                holder.ivIcon.setImageResource(R.drawable.ic_arrow_upward);
+                holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
+                break;
+            default:
+                holder.ivIcon.setImageResource(R.drawable.ic_settings);
+                holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
+                break;
         }
     }
 

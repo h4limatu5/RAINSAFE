@@ -44,25 +44,27 @@ public class SettingsActivity extends AppCompatActivity {
         tvSettings = findViewById(R.id.tvSettings);
         tvProfile = findViewById(R.id.tvProfile);
 
-        findViewById(R.id.btnMenu).setOnClickListener(v -> {
-            Intent intent = new Intent(this, MenuActivity.class);
-            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
-            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
-            startActivity(intent);
-        });
+        // btnBack is just the settings icon in this new layout, but we can make it go back
+        findViewById(R.id.headerLayout).setOnClickListener(v -> finish());
 
         // Set Settings as Active (Position 2)
         activeIndicator.post(() -> moveIndicator(2));
 
         // Navigation Listeners
         navHome.setOnClickListener(v -> {
-            startActivity(new Intent(this, DashboardActivity.class));
+            Intent intent = new Intent(this, DashboardActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
         
         navHistory.setOnClickListener(v -> {
-            startActivity(new Intent(this, HistoryActivity.class));
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
@@ -70,7 +72,10 @@ public class SettingsActivity extends AppCompatActivity {
         navSettings.setOnClickListener(v -> moveIndicator(2));
 
         navProfile.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
@@ -100,6 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
         int grey = ContextCompat.getColor(this, R.color.text_grey);
         int blue = ContextCompat.getColor(this, R.color.button_blue);
 
+        // Reset
         ivHome.setVisibility(View.VISIBLE);
         ivHistory.setVisibility(View.VISIBLE);
         ivSettings.setVisibility(View.VISIBLE);
@@ -120,12 +126,31 @@ public class SettingsActivity extends AppCompatActivity {
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvProfile.setTypeface(null, android.graphics.Typeface.NORMAL);
 
+        // Active
         switch (position) {
+            case 0:
+                ivActiveIcon.setImageResource(R.drawable.ic_home);
+                ivHome.setVisibility(View.GONE);
+                tvHome.setTextColor(blue);
+                tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
+                break;
+            case 1:
+                ivActiveIcon.setImageResource(R.drawable.ic_history);
+                ivHistory.setVisibility(View.GONE);
+                tvHistory.setTextColor(blue);
+                tvHistory.setTypeface(null, android.graphics.Typeface.BOLD);
+                break;
             case 2:
-                ivActiveIcon.setImageResource(android.R.drawable.ic_menu_preferences);
+                ivActiveIcon.setImageResource(R.drawable.ic_settings);
                 ivSettings.setVisibility(View.GONE);
                 tvSettings.setTextColor(blue);
                 tvSettings.setTypeface(null, android.graphics.Typeface.BOLD);
+                break;
+            case 3:
+                ivActiveIcon.setImageResource(R.drawable.ic_person);
+                ivProfile.setVisibility(View.GONE);
+                tvProfile.setTextColor(blue);
+                tvProfile.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
         }
     }

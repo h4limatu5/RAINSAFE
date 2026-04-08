@@ -102,6 +102,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         addLog(db, "Mode Otomatisasi Aktif!", "Sistem aktivitas otomatis diaktifkan oleh pengguna", "manual", "sensor");
         addLog(db, "Hujan Terdeteksi", "Sensor hujan mendeteksi cuaca. Intensitas sedang (52%)", "system", "rain");
         addLog(db, "Jemuran Masuk Otomatis", "Jemuran ditarik ke dalam karena terdeteksi hujan", "auto", "in");
+        addLog(db, "Sensor Cahaya: Terik", "Intensitas cahaya tinggi dideteksi (1200 lux)", "system", "sensor");
+        addLog(db, "Sensor Kelembaban Tinggi", "Kelembaban udara mencapai 85%", "system", "sensor");
+        addLog(db, "Koneksi Wi-Fi Stabil", "Perangkat terhubung ke jaringan 'RainSafe_Home'", "system", "sensor");
+        addLog(db, "Baterai Backup Terisi", "Daya cadangan sistem dalam kondisi 100%", "system", "sensor");
+        addLog(db, "Pemeliharaan Sistem Selesai", "Pengecekan rutin komponen mekanik berhasil", "system", "sensor");
+        addLog(db, "Update Firmware Tersedia", "Versi 1.2.5 tersedia untuk diunduh", "system", "sensor");
+        addLog(db, "Jemuran Dikeluarkan (Pagi)", "Sistem mengeluarkan jemuran sesuai jadwal pagi", "auto", "out");
+        addLog(db, "Sensor Hujan: Gerimis", "Terdeteksi rintik hujan ringan (10%)", "system", "rain");
+        addLog(db, "Jemuran Masuk (Manual)", "Pengguna menarik jemuran melalui aplikasi", "manual", "in");
+        addLog(db, "Mode Malam Aktif", "Sensor cahaya mendeteksi kondisi gelap, sistem standby", "auto", "sensor");
+        addLog(db, "Deteksi Angin Kencang", "Kecepatan angin melebihi ambang batas aman", "system", "sensor");
+        addLog(db, "Jemuran Aman Terlindungi", "Posisi jemuran berada di area tertutup", "system", "in");
+        addLog(db, "Kalibrasi Sensor Selesai", "Sensor hujan dan cahaya telah dikalibrasi ulang", "system", "sensor");
+        addLog(db, "Akun Berhasil Diperbarui", "Informasi profil pengguna telah diubah", "manual", "sensor");
+        addLog(db, "Login Berhasil", "Sesi baru dimulai pada perangkat Android", "manual", "sensor");
+        addLog(db, "Selamat Datang di RainSafe", "Terima kasih telah menggunakan sistem jemuran pintar kami", "system", "sensor");
     }
 
     private void insertInitialSensorData(SQLiteDatabase db) {

@@ -56,7 +56,10 @@ public class HistoryActivity extends AppCompatActivity {
 
         // Navigation Listeners
         navHome.setOnClickListener(v -> {
-            startActivity(new Intent(this, DashboardActivity.class));
+            Intent intent = new Intent(this, DashboardActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
@@ -64,13 +67,19 @@ public class HistoryActivity extends AppCompatActivity {
         navHistory.setOnClickListener(v -> moveIndicator(1));
 
         navSettings.setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
 
         navProfile.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
             overridePendingTransition(0, 0);
             finish();
         });
@@ -100,6 +109,7 @@ public class HistoryActivity extends AppCompatActivity {
         int grey = ContextCompat.getColor(this, R.color.text_grey);
         int blue = ContextCompat.getColor(this, R.color.button_blue);
 
+        // Reset
         ivHome.setVisibility(View.VISIBLE);
         ivHistory.setVisibility(View.VISIBLE);
         ivSettings.setVisibility(View.VISIBLE);
@@ -120,12 +130,31 @@ public class HistoryActivity extends AppCompatActivity {
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvProfile.setTypeface(null, android.graphics.Typeface.NORMAL);
 
+        // Active
         switch (position) {
+            case 0:
+                ivActiveIcon.setImageResource(R.drawable.ic_home);
+                ivHome.setVisibility(View.GONE);
+                tvHome.setTextColor(blue);
+                tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
+                break;
             case 1:
-                ivActiveIcon.setImageResource(android.R.drawable.ic_menu_recent_history);
+                ivActiveIcon.setImageResource(R.drawable.ic_history);
                 ivHistory.setVisibility(View.GONE);
                 tvHistory.setTextColor(blue);
                 tvHistory.setTypeface(null, android.graphics.Typeface.BOLD);
+                break;
+            case 2:
+                ivActiveIcon.setImageResource(R.drawable.ic_settings);
+                ivSettings.setVisibility(View.GONE);
+                tvSettings.setTextColor(blue);
+                tvSettings.setTypeface(null, android.graphics.Typeface.BOLD);
+                break;
+            case 3:
+                ivActiveIcon.setImageResource(R.drawable.ic_person);
+                ivProfile.setVisibility(View.GONE);
+                tvProfile.setTextColor(blue);
+                tvProfile.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
         }
     }
