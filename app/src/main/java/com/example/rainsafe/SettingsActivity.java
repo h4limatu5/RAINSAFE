@@ -1,12 +1,19 @@
 package com.example.rainsafe;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.os.LocaleListCompat;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
@@ -19,10 +26,20 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
 
+    // Settings Elements
+    private SwitchCompat swAutoMode, swNightMode, swRainSensor, swLightSensor, swNotifRain, swNotifLaundry, swNotifError, swDarkMode;
+    private RelativeLayout rlChangeWifi, rlResetDevice, rlChangePassword, rlLogoutAll, rlRainSensitivity, rlResponseDelay, rlCalibration, rlLanguage;
+    private TextView tvRainSensitivity, tvResponseDelay, tvLanguage;
+
+    private SharedPreferences sharedPreferences;
+    private static final String PREFS_NAME = "RainSafePrefs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
@@ -43,6 +60,11 @@ public class SettingsActivity extends AppCompatActivity {
         tvHistory = findViewById(R.id.tvHistory);
         tvSettings = findViewById(R.id.tvSettings);
         tvProfile = findViewById(R.id.tvProfile);
+
+        // Settings Initialization
+        initSettingsViews();
+        loadSettings();
+        setupSettingsListeners();
 
         // btnBack is just the settings icon in this new layout, but we can make it go back
         findViewById(R.id.headerLayout).setOnClickListener(v -> finish());
@@ -79,6 +101,120 @@ public class SettingsActivity extends AppCompatActivity {
             overridePendingTransition(0, 0);
             finish();
         });
+    }
+
+    private void initSettingsViews() {
+        swAutoMode = findViewById(R.id.swAutoMode);
+        swNightMode = findViewById(R.id.swNightMode);
+        swRainSensor = findViewById(R.id.swRainSensor);
+        swLightSensor = findViewById(R.id.swLightSensor);
+        swNotifRain = findViewById(R.id.swNotifRain);
+        swNotifLaundry = findViewById(R.id.swNotifLaundry);
+        swNotifError = findViewById(R.id.swNotifError);
+        swDarkMode = findViewById(R.id.swDarkMode);
+
+        rlChangeWifi = findViewById(R.id.rlChangeWifi);
+        rlResetDevice = findViewById(R.id.rlResetDevice);
+        rlChangePassword = findViewById(R.id.rlChangePassword);
+        rlLogoutAll = findViewById(R.id.rlLogoutAll);
+        rlRainSensitivity = findViewById(R.id.rlRainSensitivity);
+        rlResponseDelay = findViewById(R.id.rlResponseDelay);
+        rlCalibration = findViewById(R.id.rlCalibration);
+        rlLanguage = findViewById(R.id.rlLanguage);
+
+        tvRainSensitivity = findViewById(R.id.tvRainSensitivity);
+        tvResponseDelay = findViewById(R.id.tvResponseDelay);
+        tvLanguage = findViewById(R.id.tvLanguage);
+    }
+
+    private void loadSettings() {
+        swAutoMode.setChecked(sharedPreferences.getBoolean("auto_mode", true));
+        swNightMode.setChecked(sharedPreferences.getBoolean("night_mode", false));
+        swRainSensor.setChecked(sharedPreferences.getBoolean("rain_sensor", true));
+        swLightSensor.setChecked(sharedPreferences.getBoolean("light_sensor", true));
+        swNotifRain.setChecked(sharedPreferences.getBoolean("notif_rain", true));
+        swNotifLaundry.setChecked(sharedPreferences.getBoolean("notif_laundry", true));
+        swNotifError.setChecked(sharedPreferences.getBoolean("notif_error", true));
+        swDarkMode.setChecked(sharedPreferences.getBoolean("dark_mode", false));
+
+        tvRainSensitivity.setText(sharedPreferences.getString("rain_sensitivity", "Medium"));
+        tvResponseDelay.setText(sharedPreferences.getString("response_delay", "5 detik"));
+        tvLanguage.setText(sharedPreferences.getString("language", "Indonesia"));
+    }
+
+    private void setupSettingsListeners() {
+        swAutoMode.setOnCheckedChangeListener((v, isChecked) -> saveSetting("auto_mode", isChecked));
+        swNightMode.setOnCheckedChangeListener((v, isChecked) -> saveSetting("night_mode", isChecked));
+        swRainSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("rain_sensor", isChecked));
+        swLightSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("light_sensor", isChecked));
+        swNotifRain.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_rain", isChecked));
+        swNotifLaundry.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_laundry", isChecked));
+        swNotifError.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_error", isChecked));
+        
+        swDarkMode.setOnCheckedChangeListener((v, isChecked) -> {
+            saveSetting("dark_mode", isChecked);
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
+
+        rlChangeWifi.setOnClickListener(v -> Toast.makeText(this, "Fitur Ganti WiFi akan segera hadir", Toast.LENGTH_SHORT).show());
+        rlResetDevice.setOnClickListener(v -> Toast.makeText(this, "Mereset perangkat...", Toast.LENGTH_SHORT).show());
+        rlChangePassword.setOnClickListener(v -> Toast.makeText(this, "Fitur Ganti Password akan segera hadir", Toast.LENGTH_SHORT).show());
+        
+        rlLogoutAll.setOnClickListener(v -> {
+            Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        rlRainSensitivity.setOnClickListener(v -> Toast.makeText(this, "Pengaturan Sensitivitas", Toast.LENGTH_SHORT).show());
+        rlResponseDelay.setOnClickListener(v -> Toast.makeText(this, "Pengaturan Delay", Toast.LENGTH_SHORT).show());
+        rlCalibration.setOnClickListener(v -> Toast.makeText(this, "Memulai Kalibrasi...", Toast.LENGTH_SHORT).show());
+        rlLanguage.setOnClickListener(v -> showLanguageDialog());
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = {"Indonesia", "English"};
+        String[] languageCodes = {"in", "en"};
+        int checkedItem = 0; // Default to Indonesia
+        
+        String currentLang = sharedPreferences.getString("language_code", "in");
+        if ("en".equals(currentLang)) {
+            checkedItem = 1;
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Pilih Bahasa")
+                .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                    String selectedLanguage = languages[which];
+                    String selectedCode = languageCodes[which];
+                    
+                    tvLanguage.setText(selectedLanguage);
+                    saveSetting("language", selectedLanguage);
+                    saveSetting("language_code", selectedCode);
+                    
+                    // Apply language change using AppCompatDelegate
+                    LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(selectedCode);
+                    AppCompatDelegate.setApplicationLocales(appLocale);
+
+                    Toast.makeText(this, "Bahasa diubah ke " + selectedLanguage, Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void saveSetting(String key, boolean value) {
+        sharedPreferences.edit().putBoolean(key, value).apply();
+    }
+
+    private void saveSetting(String key, String value) {
+        sharedPreferences.edit().putString(key, value).apply();
     }
 
     private void moveIndicator(int position) {

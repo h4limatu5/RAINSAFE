@@ -1,0 +1,201 @@
+<resources>
+    <string name="app_name">RainSafe</string>
+    <string name="title_rainsafe">RAINSAFE</string>
+    <string name="title_smart_living">SMART LIVING</string>
+    <string name="button_login">Login</string>
+    <string name="desc_weather_icon">Weather Icon</string>
+    <string name="title_sign_in">Sign In</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="label_remember_me">Remember me</string>
+    <string name="label_forgot_password">Forgot your password</string>
+    <string name="label_create_account">Don’t have an account? Create one</string>
+    <string name="desc_user_icon">User Icon</string>
+    <string name="title_create_account">Register</string>
+    <string name="hint_email">Email Address</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="button_register">REGISTER</string>
+    <string name="label_already_have_account">Already have an account? Sign In</string>
+
+    <!-- Welcome Screen -->
+    <string name="welcome_text">Welcome</string>
+    <string name="welcome_app_name">RainSafe</string>
+    <string name="welcome_app_subtitle">Smart Laundry Control</string>
+    <string name="welcome_feature_title">Smart Rain Detection</string>
+    <string name="welcome_feature_desc">Automatic sensors retract laundry when rain is detected</string>
+    <string name="button_skip">Skip</string>
+    <string name="button_next">Next</string>
+
+    <!-- Login Screen -->
+    <string name="login_welcome_back">Welcome Back</string>
+    <string name="login_subtitle">Log in to your RainSafe account</string>
+    <string name="login_tab_email">Email</string>
+    <string name="login_tab_phone">Phone + OTP</string>
+    <string name="login_label_email">Email Address</string>
+    <string name="login_label_password">Password</string>
+    <string name="login_hint_email">andi@gmail.com</string>
+    <string name="login_hint_password">12345678</string>
+    <string name="login_remember_me">Remember me on this device</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_no_account">Don\'t have an account? </string>
+    <string name="login_register_here">Register here</string>
+
+    <!-- Forgot Password Screen -->
+    <string name="forgot_title">Forgot Password</string>
+    <string name="forgot_subtitle">Enter your registered email to reset password</string>
+    <string name="forgot_label_email">Email Address</string>
+    <string name="forgot_hint_email">andi@gmail.com</string>
+    <string name="forgot_label_new_password">New Password</string>
+    <string name="forgot_hint_new_password">Min 8 characters</string>
+    <string name="forgot_button">Reset Password</string>
+    <string name="forgot_back_to_login">Back to Login</string>
+    <string name="msg_reset_success">Password changed successfully</string>
+    <string name="msg_reset_failed">Reset failed. Email not found.</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Create New Account</string>
+    <string name="register_subtitle">Register to use RainSafe</string>
+    <string name="register_label_fullname">Full Name</string>
+    <string name="register_hint_fullname">Ahmad Ridho</string>
+    <string name="register_label_email">Email Address</string>
+    <string name="register_hint_email">admin</string>
+    <string name="register_label_phone">Phone Number</string>
+    <string name="register_hint_phone">+62 812-3456-7890</string>
+    <string name="register_label_password">Password</string>
+    <string name="register_hint_password">Pelangi.1</string>
+    <string name="register_password_helper">Minimum 8 characters, mixed case</string>
+    <string name="register_label_confirm_password">Confirm Password</string>
+    <string name="register_hint_confirm_password">Repeat password</string>
+    <string name="register_terms">I agree to the Terms &amp; Conditions and Privacy Policy</string>
+    <string name="register_button">Create Account</string>
+    <string name="register_already_have_account">Already have an account? </string>
+    <string name="register_login_here">Login here</string>
+
+    <!-- Dashboard Screen -->
+    <string name="dash_status_connected">Connected</string>
+    <string name="dash_updated_now">Updated now</string>
+    <string name="dash_location">Banjarmasin, South Kalimantan</string>
+    <string name="dash_temp">27 °C</string>
+    <string name="dash_weather_desc">Partly Cloudy</string>
+    <string name="dash_humidity">Humidity</string>
+    <string name="dash_val_humidity">65%</string>
+    <string name="dash_wind">Wind</string>
+    <string name="dash_val_wind">12 km/h</string>
+    <string name="dash_rain_prob_label">Probability</string>
+    <string name="dash_rain_prob">Rain</string>
+    <string name="dash_val_rain_prob">5%</string>
+    <string name="dash_btn_pull_in">Retract Laundry</string>
+    <string name="dash_btn_pull_out">Extend Laundry</string>
+    <string name="dash_auto_title">Comprehensive Automation</string>
+    <string name="dash_auto_desc">Smart Laundry Auto Mode</string>
+    <string name="dash_auto_active">ACTIVE</string>
+    <string name="dash_status_title">Laundry Status</string>
+    <string name="dash_cloth_status">Wet Laundry</string>
+    <string name="dash_cloth_start">Start: 15:00 WITA</string>
+    <string name="dash_cloth_pos_out">OUTSIDE</string>
+    <string name="dash_label_dry_percent">Dryness Percentage</string>
+    <string name="dash_val_dry_percent">45%</string>
+    <string name="dash_label_dry_est">Est. Drying Time</string>
+    <string name="dash_val_dry_est">2 hours 30 mins</string>
+    <string name="dash_label_quality">Quality Rating</string>
+    <string name="dash_val_quality">85%</string>
+    <string name="dash_label_duration">Laundry Duration</string>
+    <string name="dash_val_duration">0 hours 20 mins</string>
+    <string name="dash_stats_title">Today\'s Statistics</string>
+    <string name="dash_stats_label_total">Total Laundry Time</string>
+    <string name="dash_stats_val_total">6 hours 10 mins</string>
+    <string name="dash_stats_label_avg_hum">Average Humidity</string>
+    <string name="dash_stats_val_avg_hum">62%</string>
+    <string name="dash_stats_label_rain">Rain Events</string>
+    <string name="dash_stats_val_rain">0 times</string>
+    <string name="dash_stats_status_safe">Safe</string>
+    <string name="dash_sensor_title">Sensor Status</string>
+    <string name="dash_sensor_rain">Rain Sensor</string>
+    <string name="dash_sensor_light">Light Sensor</string>
+    <string name="dash_sensor_hum">Humidity Sensor</string>
+    <string name="dash_sensor_active">Active</string>
+
+    <!-- History Screen -->
+    <string name="hist_tab_all">All</string>
+    <string name="hist_tab_laundry">Laundry</string>
+    <string name="hist_tab_rain">Rain</string>
+    <string name="hist_tab_sensor">Sensor</string>
+    <string name="hist_stats_weekly">Weekly Statistics</string>
+    <string name="hist_val_laundry_count">12x</string>
+    <string name="hist_label_laundry_count">Laundry Retracted</string>
+    <string name="hist_val_total_duration">42 hours 15 mins</string>
+    <string name="hist_label_total_duration">Total Duration</string>
+    <string name="hist_val_rain_count">5x</string>
+    <string name="hist_label_rain_count">Rain Detected</string>
+    <string name="hist_val_success_rate">87%</string>
+    <string name="hist_label_success_rate">Success Rate</string>
+    <string name="hist_activity_title">Activity History</string>
+    <string name="hist_today">TODAY</string>
+    <string name="hist_yesterday">YESTERDAY</string>
+    <string name="hist_2days_ago">2 DAYS AGO</string>
+    <string name="hist_load_more">LOAD MORE</string>
+
+    <!-- History Items -->
+    <string name="hist_item_out_title">Laundry Extended</string>
+    <string name="hist_item_out_desc">Status changed from \'Inside\' to \'Outside\'. Automatic</string>
+    <string name="hist_item_auto_active">Automation Mode Active!</string>
+    <string name="hist_item_auto_desc">Automatic activity system enabled by user</string>
+    <string name="hist_item_rain_detected">Rain Detected</string>
+    <string name="hist_item_rain_desc">Rain sensor detected weather. Medium intensity (52%)</string>
+    <string name="hist_item_in_auto">Automatic Laundry Retraction</string>
+    <string name="hist_item_in_desc">Laundry retracted due to rain detection</string>
+    <string name="hist_item_out_manual">Laundry extended after previously being dried</string>
+    <string name="hist_item_sensor_light">Light Sensor Active</string>
+    <string name="hist_item_sensor_desc">Lighting condition normal (82%)</string>
+    <string name="hist_item_morning_out">Morning. Sunny weather, humidity 45%</string>
+
+    <!-- Badges -->
+    <string name="badge_auto">Auto</string>
+    <string name="badge_manual">Manual</string>
+    <string name="badge_system">System</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_name">Ahmad Ridho</string>
+    <string name="profile_email">ahmad.ridho@email.com</string>
+    <string name="profile_info_device_title">Device Information</string>
+    <string name="profile_label_device_name">Device Name</string>
+    <string name="profile_val_device_name">RainSafe Laundry</string>
+    <string name="profile_label_status">Status</string>
+    <string name="profile_val_status_online">Online</string>
+    <string name="profile_label_location">Location</string>
+    <string name="profile_val_location">Home</string>
+    <string name="profile_label_firmware">Firmware</string>
+    <string name="profile_val_firmware">v2.1.0</string>
+    <string name="profile_activity_title">Activity</string>
+    <string name="profile_label_total_usage">Total Usage</string>
+    <string name="profile_val_total_usage">247 hours</string>
+    <string name="profile_label_last_used">Last Used</string>
+    <string name="profile_val_last_used">Today</string>
+    <string name="profile_label_last_status">Last Status</string>
+    <string name="profile_val_last_status">Laundry Out</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_logout">Logout</string>
+
+    <!-- Menu Screen -->
+    <string name="menu_title">Main Menu</string>
+    <string name="menu_close">Close</string>
+    <string name="menu_help">Help &amp; Support</string>
+    <string name="menu_about">About App</string>
+    <string name="menu_version">Version 1.0.0</string>
+
+    <!-- Login Messages -->
+    <string name="error_empty_fields">Please enter email and password</string>
+    <string name="msg_forgot_password_unavailable">Forgot Password feature not available yet</string>
+
+    <!-- Register Messages -->
+    <string name="error_all_fields_required">All fields are required</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_email_exists">Email already registered</string>
+    <string name="msg_register_success">Registration Successful! Please Login</string>
+    <string name="error_register_failed">Registration Failed. Try again.</string>
+</resources>
