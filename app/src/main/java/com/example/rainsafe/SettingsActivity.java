@@ -20,9 +20,6 @@ import androidx.core.content.ContextCompat;
 public class SettingsActivity extends AppCompatActivity {
 
     private LinearLayout navHome, navHistory, navSettings, navProfile;
-    private CardView activeIndicator;
-    private View navCurve;
-    private ImageView ivActiveIcon;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
 
@@ -33,6 +30,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "RainSafePrefs";
+
+    private ImageView ivAutoSectionIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
         navHistory = findViewById(R.id.navHistory);
         navSettings = findViewById(R.id.navSettings);
         navProfile = findViewById(R.id.navProfile);
-        
-        activeIndicator = findViewById(R.id.activeIndicator);
-        navCurve = findViewById(R.id.navCurve);
-        ivActiveIcon = findViewById(R.id.ivActiveIcon);
         
         ivHome = findViewById(R.id.ivHome);
         ivHistory = findViewById(R.id.ivHistory);
@@ -70,7 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.headerLayout).setOnClickListener(v -> finish());
 
         // Set Settings as Active (Position 2)
-        activeIndicator.post(() -> moveIndicator(2));
+        updateNavUI(2);
 
         // Navigation Listeners
         navHome.setOnClickListener(v -> {
@@ -91,7 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
             finish();
         });
 
-        navSettings.setOnClickListener(v -> moveIndicator(2));
+        navSettings.setOnClickListener(v -> updateNavUI(2));
 
         navProfile.setOnClickListener(v -> {
             Intent intent = new Intent(this, ProfileActivity.class);
@@ -125,10 +120,14 @@ public class SettingsActivity extends AppCompatActivity {
         tvRainSensitivity = findViewById(R.id.tvRainSensitivity);
         tvResponseDelay = findViewById(R.id.tvResponseDelay);
         tvLanguage = findViewById(R.id.tvLanguage);
+        ivAutoSectionIcon = findViewById(R.id.ivAutoSectionIcon);
     }
 
     private void loadSettings() {
-        swAutoMode.setChecked(sharedPreferences.getBoolean("auto_mode", true));
+        boolean isAutoMode = sharedPreferences.getBoolean("auto_mode", true);
+        swAutoMode.setChecked(isAutoMode);
+        updateAutoIconState(isAutoMode);
+        
         swNightMode.setChecked(sharedPreferences.getBoolean("night_mode", false));
         swRainSensor.setChecked(sharedPreferences.getBoolean("rain_sensor", true));
         swLightSensor.setChecked(sharedPreferences.getBoolean("light_sensor", true));
@@ -143,7 +142,10 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupSettingsListeners() {
-        swAutoMode.setOnCheckedChangeListener((v, isChecked) -> saveSetting("auto_mode", isChecked));
+        swAutoMode.setOnCheckedChangeListener((v, isChecked) -> {
+            saveSetting("auto_mode", isChecked);
+            updateAutoIconState(isChecked);
+        });
         swNightMode.setOnCheckedChangeListener((v, isChecked) -> saveSetting("night_mode", isChecked));
         swRainSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("rain_sensor", isChecked));
         swLightSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("light_sensor", isChecked));
@@ -152,11 +154,13 @@ public class SettingsActivity extends AppCompatActivity {
         swNotifError.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_error", isChecked));
         
         swDarkMode.setOnCheckedChangeListener((v, isChecked) -> {
-            saveSetting("dark_mode", isChecked);
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            if (v.isPressed()) {
+                saveSetting("dark_mode", isChecked);
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
             }
         });
 
@@ -217,36 +221,21 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPreferences.edit().putString(key, value).apply();
     }
 
-    private void moveIndicator(int position) {
-        float screenWidth = getResources().getDisplayMetrics().widthPixels;
-        float itemWidth = screenWidth / 4;
-        
-        float targetXIndicator = (itemWidth * position) + (itemWidth / 2) - (activeIndicator.getWidth() / 2f);
-        float targetXCurve = (itemWidth * position) + (itemWidth / 2) - (navCurve.getWidth() / 2f);
-
-        activeIndicator.animate()
-                .translationX(targetXIndicator)
-                .setDuration(300)
-                .start();
-
-        navCurve.animate()
-                .translationX(targetXCurve)
-                .setDuration(300)
-                .start();
-
-        updateNavUI(position);
+    private void updateAutoIconState(boolean isActive) {
+        if (ivAutoSectionIcon != null) {
+            if (isActive) {
+                ivAutoSectionIcon.setColorFilter(ContextCompat.getColor(this, R.color.button_blue));
+            } else {
+                ivAutoSectionIcon.setColorFilter(ContextCompat.getColor(this, R.color.text_grey));
+            }
+        }
     }
 
     private void updateNavUI(int position) {
         int grey = ContextCompat.getColor(this, R.color.text_grey);
         int blue = ContextCompat.getColor(this, R.color.button_blue);
 
-        // Reset
-        ivHome.setVisibility(View.VISIBLE);
-        ivHistory.setVisibility(View.VISIBLE);
-        ivSettings.setVisibility(View.VISIBLE);
-        ivProfile.setVisibility(View.VISIBLE);
-        
+        // Reset all to grey/normal
         ivHome.setColorFilter(grey);
         ivHistory.setColorFilter(grey);
         ivSettings.setColorFilter(grey);
@@ -262,29 +251,25 @@ public class SettingsActivity extends AppCompatActivity {
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvProfile.setTypeface(null, android.graphics.Typeface.NORMAL);
 
-        // Active
+        // Set active item to blue/bold
         switch (position) {
             case 0:
-                ivActiveIcon.setImageResource(R.drawable.ic_home);
-                ivHome.setVisibility(View.GONE);
+                ivHome.setColorFilter(blue);
                 tvHome.setTextColor(blue);
                 tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 1:
-                ivActiveIcon.setImageResource(R.drawable.ic_history);
-                ivHistory.setVisibility(View.GONE);
+                ivHistory.setColorFilter(blue);
                 tvHistory.setTextColor(blue);
                 tvHistory.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 2:
-                ivActiveIcon.setImageResource(R.drawable.ic_settings);
-                ivSettings.setVisibility(View.GONE);
+                ivSettings.setColorFilter(blue);
                 tvSettings.setTextColor(blue);
                 tvSettings.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 3:
-                ivActiveIcon.setImageResource(R.drawable.ic_person);
-                ivProfile.setVisibility(View.GONE);
+                ivProfile.setColorFilter(blue);
                 tvProfile.setTextColor(blue);
                 tvProfile.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;

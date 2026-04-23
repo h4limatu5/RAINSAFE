@@ -49,6 +49,16 @@ public class MenuActivity extends AppCompatActivity {
             finish();
         });
 
+        findViewById(R.id.menuHelp).setOnClickListener(v -> {
+            Intent intent = new Intent(this, HelpActivity.class);
+            startActivity(intent);
+        });
+
+        findViewById(R.id.menuAbout).setOnClickListener(v -> {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+        });
+
         findViewById(R.id.menuLogout).setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

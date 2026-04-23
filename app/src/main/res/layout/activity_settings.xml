@@ -60,9 +60,10 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp">
                 <ImageView
+                    android:id="@+id/ivAutoSectionIcon"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:src="@drawable/ic_laundry"
+                    android:src="@drawable/ic_robot"
                     app:tint="@color/button_blue" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -703,56 +704,24 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNavContainer"
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="75dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Background Putih Bar -->
         <View
             android:id="@+id/bottomNavBg"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:background="@drawable/nav_glow"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <!-- Indikator Lingkaran Biru -->
-        <View
-            android:id="@+id/navCurve"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:background="@drawable/nav_curve_bg"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/activeIndicator"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            app:cardBackgroundColor="@color/button_blue"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="4dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.625"
-            android:layout_marginTop="5dp">
-
-            <ImageView
-                android:id="@+id/ivActiveIcon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
-                android:src="@drawable/ic_settings"
-                android:contentDescription="@null"
-                app:tint="@color/white" />
-        </androidx.cardview.widget.CardView>
+            android:layout_height="match_parent"
+            android:background="@color/card_white"
+            android:elevation="8dp" />
 
         <!-- Menu Items -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:weightSum="4"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:elevation="9dp"
+            android:weightSum="4">
 
             <LinearLayout
                 android:id="@+id/navHome"
@@ -813,8 +782,7 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_settings"
                     android:contentDescription="@null"
-                    app:tint="@color/text_grey"
-                    android:visibility="invisible" />
+                    app:tint="@color/button_blue" />
                 <TextView
                     android:id="@+id/tvSettings"
                     android:layout_width="wrap_content"

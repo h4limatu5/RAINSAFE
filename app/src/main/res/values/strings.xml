@@ -108,6 +108,8 @@
     <string name="dash_stats_val_avg_hum">62%</string>
     <string name="dash_stats_label_rain">Kejadian Hujan</string>
     <string name="dash_stats_val_rain">0 kali</string>
+    <string name="dash_stats_label_efficiency">Efisiensi Jemur</string>
+    <string name="dash_stats_val_efficiency">92%</string>
     <string name="dash_stats_status_safe">Aman</string>
     <string name="dash_sensor_title">Status Sensor</string>
     <string name="dash_sensor_rain">Sensor Hujan</string>
@@ -187,6 +189,31 @@
     <string name="menu_help">Bantuan &amp; Dukungan</string>
     <string name="menu_about">Tentang Aplikasi</string>
     <string name="menu_version">Versi 1.0.0</string>
+
+    <!-- Help & Support Screen -->
+    <string name="help_title">Bantuan &amp; Dukungan</string>
+    <string name="help_faq_title">Pertanyaan Umum (FAQ)</string>
+    <string name="help_faq_q1">Bagaimana cara kerja RainSafe?</string>
+    <string name="help_faq_a1">RainSafe menggunakan sensor hujan untuk mendeteksi tetesan air dan secara otomatis menarik jemuran ke tempat teduh.</string>
+    <string name="help_faq_q2">Apakah saya perlu koneksi internet?</string>
+    <string name="help_faq_a2">Ya, perangkat memerlukan koneksi WiFi agar Anda dapat menerima notifikasi dan mengontrolnya dari jarak jauh melalui aplikasi.</string>
+    <string name="help_contact_title">Hubungi Kami</string>
+    <string name="help_support_email">support@rainsafe.com</string>
+    <string name="help_support_phone">+62 812 3456 7890</string>
+    <string name="desc_back">Kembali</string>
+    <string name="desc_email">Email</string>
+    <string name="desc_phone">Telepon</string>
+
+    <!-- About App Screen -->
+    <string name="about_title">Tentang Aplikasi</string>
+    <string name="about_app_description">RainSafe adalah solusi cerdas untuk manajemen jemuran Anda. Menggunakan teknologi IoT terkini, kami membantu melindungi pakaian Anda dari hujan secara otomatis.</string>
+    <string name="about_version_label">Versi Aplikasi</string>
+    <string name="about_version_val">1.0.0 (Stable)</string>
+    <string name="about_developer_label">Dikembangkan Oleh</string>
+    <string name="about_developer_val">RainSafe Team @ 2024</string>
+    <string name="about_website_label">Kunjungi Website</string>
+    <string name="about_website_val">www.rainsafe.com</string>
+    <string name="desc_logo">RainSafe Logo</string>
 
     <!-- Login Messages -->
     <string name="error_empty_fields">Harap isi email dan password</string>

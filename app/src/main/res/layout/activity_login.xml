@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_welcome_card"
+    android:background="@color/bg_dashboard"
     tools:context=".LoginActivity">
 
     <TextView
@@ -38,6 +38,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="24dp"
+        app:cardBackgroundColor="@color/card_white"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/tvLoginSubtitle">
@@ -131,7 +132,7 @@
                         android:id="@+id/lineTabPhone"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#EEEEEE" />
+                        android:background="@color/posisi_box_bg" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -186,7 +187,8 @@
                         android:layout_height="20dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="12dp"
-                        android:src="@drawable/ic_lock" />
+                        android:src="@drawable/ic_lock"
+                        app:tint="@color/black" />
 
                     <EditText
                         android:id="@+id/etPassword"
@@ -205,7 +207,8 @@
                         android:layout_height="20dp"
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginEnd="12dp"
-                        android:src="@drawable/ic_visibility" />
+                        android:src="@drawable/ic_visibility"
+                        app:tint="@color/text_grey" />
                 </FrameLayout>
             </LinearLayout>
 

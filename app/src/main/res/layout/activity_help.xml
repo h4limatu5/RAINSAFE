@@ -28,14 +28,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="8dp"
-                android:src="@drawable/ic_back"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="@string/desc_back"
                 app:tint="@color/white" />
         </androidx.cardview.widget.CardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bantuan &amp; Dukungan"
+            android:text="@string/help_title"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -60,7 +61,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pertanyaan Umum (FAQ)"
+                android:text="@string/help_faq_title"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -82,14 +83,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Bagaimana cara kerja RainSafe?"
+                        android:text="@string/help_faq_q1"
                         android:textColor="@color/black"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="RainSafe menggunakan sensor hujan untuk mendeteksi tetesan air dan secara otomatis menarik jemuran ke tempat teduh."
+                        android:text="@string/help_faq_a1"
                         android:textColor="@color/text_grey"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -111,14 +112,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Apakah saya perlu koneksi internet?"
+                        android:text="@string/help_faq_q2"
                         android:textColor="@color/black"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Ya, perangkat memerlukan koneksi WiFi agar Anda dapat menerima notifikasi dan mengontrolnya dari jarak jauh melalui aplikasi."
+                        android:text="@string/help_faq_a2"
                         android:textColor="@color/text_grey"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -127,7 +128,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hubungi Kami"
+                android:text="@string/help_contact_title"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -151,17 +152,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:paddingVertical="8dp">
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_email"
+                            android:contentDescription="@string/desc_email"
                             app:tint="@color/button_blue" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="support@rainsafe.com"
+                            android:text="@string/help_support_email"
                             android:textColor="@color/black" />
                     </LinearLayout>
 
@@ -170,17 +175,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:paddingVertical="8dp">
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_call"
+                            android:src="@drawable/ic_phone"
+                            android:contentDescription="@string/desc_phone"
                             app:tint="@color/button_blue" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="+62 812 3456 7890"
+                            android:text="@string/help_support_phone"
                             android:textColor="@color/black" />
                     </LinearLayout>
 

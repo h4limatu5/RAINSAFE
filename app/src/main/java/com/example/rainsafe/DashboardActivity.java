@@ -19,18 +19,18 @@ import java.util.Random;
 public class DashboardActivity extends AppCompatActivity {
 
     private LinearLayout navHome, navHistory, navSettings, navProfile;
-    private CardView activeIndicator;
-    private View navCurve;
-    private ImageView ivActiveIcon;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
 
     // Real-time Views
-    private TextView tvHumidityVal, tvRainProbVal, tvAvgHumVal;
-    private TextView tvSensorRainStatus, tvSensorLightStatus, tvSensorHumStatus;
-    private ProgressBar pbAvgHum;
+    private TextView tvRainProbVal, tvCurrentDuration, tvStatsTotalDuration;
+    private TextView tvSensorRainStatus, tvSensorLightStatus;
     private View notificationDot;
+    private ImageView ivAutoIcon;
+    private CardView cvAutoIcon;
     private boolean isRaining = false;
+    private boolean isLaundryOut = true; // Initial state based on XML
+    private long laundryStartTime = System.currentTimeMillis() - (20 * 60 * 1000); // Simulated 20 mins ago
 
     private DatabaseHelper dbHelper;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -49,10 +49,6 @@ public class DashboardActivity extends AppCompatActivity {
         navSettings = findViewById(R.id.navSettings);
         navProfile = findViewById(R.id.navProfile);
         
-        activeIndicator = findViewById(R.id.activeIndicator);
-        navCurve = findViewById(R.id.navCurve);
-        ivActiveIcon = findViewById(R.id.ivActiveIcon);
-        
         ivHome = findViewById(R.id.ivHome);
         ivHistory = findViewById(R.id.ivHistory);
         ivSettings = findViewById(R.id.ivSettings);
@@ -64,16 +60,31 @@ public class DashboardActivity extends AppCompatActivity {
         tvProfile = findViewById(R.id.tvProfile);
 
         // Initialize Real-time Views
-        tvHumidityVal = findViewById(R.id.tvHumidityVal);
         tvRainProbVal = findViewById(R.id.tvRainProbVal);
-        tvAvgHumVal = findViewById(R.id.tvAvgHumVal);
-        pbAvgHum = findViewById(R.id.pbAvgHum);
+        tvCurrentDuration = findViewById(R.id.tvCurrentDuration);
+        tvStatsTotalDuration = findViewById(R.id.tvStatsTotalDuration);
         tvSensorRainStatus = findViewById(R.id.tvSensorRainStatus);
         tvSensorLightStatus = findViewById(R.id.tvSensorLightStatus);
-        tvSensorHumStatus = findViewById(R.id.tvSensorHumStatus);
         notificationDot = findViewById(R.id.notificationDot);
+        ivAutoIcon = findViewById(R.id.ivAutoIcon);
+        cvAutoIcon = findViewById(R.id.cvAutoIcon);
 
         findViewById(R.id.btnRefresh).setOnClickListener(v -> updateSensorUI());
+
+        findViewById(R.id.btnPullIn).setOnClickListener(v -> {
+            isLaundryOut = false;
+            android.widget.Toast.makeText(this, "Jemuran dimasukkan", android.widget.Toast.LENGTH_SHORT).show();
+            dbHelper.addLog("Manual", "Jemuran dimasukkan secara manual", "user", "action");
+        });
+
+        findViewById(R.id.btnPullOut).setOnClickListener(v -> {
+            if (!isLaundryOut) {
+                laundryStartTime = System.currentTimeMillis();
+            }
+            isLaundryOut = true;
+            android.widget.Toast.makeText(this, "Jemuran dikeluarkan", android.widget.Toast.LENGTH_SHORT).show();
+            dbHelper.addLog("Manual", "Jemuran dikeluarkan secara manual", "user", "action");
+        });
 
         findViewById(R.id.btnMenu).setOnClickListener(v -> {
             Intent intent = new Intent(this, MenuActivity.class);
@@ -88,10 +99,10 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         // Set Default Position (Home - 0)
-        activeIndicator.post(() -> moveIndicator(0));
+        updateNavUI(0);
 
         // Navigation Listeners
-        navHome.setOnClickListener(v -> moveIndicator(0));
+        navHome.setOnClickListener(v -> updateNavUI(0));
         
         navHistory.setOnClickListener(v -> {
             Intent intent = new Intent(this, HistoryActivity.class);
@@ -138,20 +149,33 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void updateSensorUI() {
+        // Update Auto Mode Icon and Background based on Settings
+        android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+        boolean isAutoMode = prefs.getBoolean("auto_mode", true);
+        if (ivAutoIcon != null && cvAutoIcon != null) {
+            if (isAutoMode) {
+                cvAutoIcon.setCardBackgroundColor(android.graphics.Color.parseColor("#BDE2F9"));
+                ivAutoIcon.setColorFilter(ContextCompat.getColor(this, R.color.black));
+            } else {
+                cvAutoIcon.setCardBackgroundColor(android.graphics.Color.parseColor("#EEEEEE"));
+                ivAutoIcon.setColorFilter(ContextCompat.getColor(this, R.color.text_grey));
+            }
+        }
+
+        // Update Duration
+        if (isLaundryOut) {
+            long elapsedMillis = System.currentTimeMillis() - laundryStartTime;
+            long minutes = (elapsedMillis / (1000 * 60)) % 60;
+            long hours = (elapsedMillis / (1000 * 60 * 60));
+            tvCurrentDuration.setText(hours + " jam " + minutes + " menit");
+            
+            // Update total stats (simulated addition)
+            tvStatsTotalDuration.setText((6 + hours) + " jam " + (10 + minutes) + " menit");
+        }
+
         // Fetch from Database
         Map<String, String> rainData = dbHelper.getLatestSensorData("Sensor Hujan");
         Map<String, String> lightData = dbHelper.getLatestSensorData("Sensor Cahaya");
-        Map<String, String> humData = dbHelper.getLatestSensorData("Sensor Kelembaban");
-
-        if (!humData.isEmpty()) {
-            String val = humData.get("value") + humData.get("unit");
-            tvHumidityVal.setText(val);
-            tvAvgHumVal.setText(val);
-            tvSensorHumStatus.setText("aktif (" + val + ")");
-            try {
-                pbAvgHum.setProgress(Integer.parseInt(humData.get("value")));
-            } catch (Exception ignored) {}
-        }
 
         if (!rainData.isEmpty()) {
             tvRainProbVal.setText(rainData.get("value") + rainData.get("unit"));
@@ -230,36 +254,11 @@ public class DashboardActivity extends AppCompatActivity {
         handler.removeCallbacks(updateRunnable);
     }
 
-    private void moveIndicator(int position) {
-        float screenWidth = getResources().getDisplayMetrics().widthPixels;
-        float itemWidth = screenWidth / 4;
-        
-        float targetXIndicator = (itemWidth * position) + (itemWidth / 2) - (activeIndicator.getWidth() / 2f);
-        float targetXCurve = (itemWidth * position) + (itemWidth / 2) - (navCurve.getWidth() / 2f);
-
-        activeIndicator.animate()
-                .translationX(targetXIndicator)
-                .setDuration(300)
-                .start();
-
-        navCurve.animate()
-                .translationX(targetXCurve)
-                .setDuration(300)
-                .start();
-
-        updateNavUI(position);
-    }
-
     private void updateNavUI(int position) {
         int grey = ContextCompat.getColor(this, R.color.text_grey);
         int blue = ContextCompat.getColor(this, R.color.button_blue);
 
-        // Reset
-        ivHome.setVisibility(View.VISIBLE);
-        ivHistory.setVisibility(View.VISIBLE);
-        ivSettings.setVisibility(View.VISIBLE);
-        ivProfile.setVisibility(View.VISIBLE);
-        
+        // Reset all to grey/normal
         ivHome.setColorFilter(grey);
         ivHistory.setColorFilter(grey);
         ivSettings.setColorFilter(grey);
@@ -275,29 +274,25 @@ public class DashboardActivity extends AppCompatActivity {
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvProfile.setTypeface(null, android.graphics.Typeface.NORMAL);
 
-        // Active
+        // Set active item to blue/bold
         switch (position) {
             case 0:
-                ivActiveIcon.setImageResource(R.drawable.ic_home);
-                ivHome.setVisibility(View.GONE);
+                ivHome.setColorFilter(blue);
                 tvHome.setTextColor(blue);
                 tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 1:
-                ivActiveIcon.setImageResource(R.drawable.ic_history);
-                ivHistory.setVisibility(View.GONE);
+                ivHistory.setColorFilter(blue);
                 tvHistory.setTextColor(blue);
                 tvHistory.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 2:
-                ivActiveIcon.setImageResource(R.drawable.ic_settings);
-                ivSettings.setVisibility(View.GONE);
+                ivSettings.setColorFilter(blue);
                 tvSettings.setTextColor(blue);
                 tvSettings.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 3:
-                ivActiveIcon.setImageResource(R.drawable.ic_person);
-                ivProfile.setVisibility(View.GONE);
+                ivProfile.setColorFilter(blue);
                 tvProfile.setTextColor(blue);
                 tvProfile.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;

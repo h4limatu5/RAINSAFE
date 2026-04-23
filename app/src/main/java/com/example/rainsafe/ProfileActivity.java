@@ -13,9 +13,6 @@ import androidx.core.content.ContextCompat;
 public class ProfileActivity extends AppCompatActivity {
 
     private LinearLayout navHome, navHistory, navSettings, navProfile;
-    private CardView activeIndicator;
-    private View navCurve;
-    private ImageView ivActiveIcon;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
     private TextView tvProfileName, tvProfileEmail, tvProfilePhone;
@@ -42,10 +39,6 @@ public class ProfileActivity extends AppCompatActivity {
         navSettings = findViewById(R.id.navSettings);
         navProfile = findViewById(R.id.navProfile);
         
-        activeIndicator = findViewById(R.id.activeIndicator);
-        navCurve = findViewById(R.id.navCurve);
-        ivActiveIcon = findViewById(R.id.ivActiveIcon);
-        
         ivHome = findViewById(R.id.ivHome);
         ivHistory = findViewById(R.id.ivHistory);
         ivSettings = findViewById(R.id.ivSettings);
@@ -64,7 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Set Profile as Active (Position 3)
-        activeIndicator.post(() -> moveIndicator(3));
+        updateNavUI(3);
 
         // Navigation Listeners
         navHome.setOnClickListener(v -> {
@@ -94,7 +87,7 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
 
-        navProfile.setOnClickListener(v -> moveIndicator(3));
+        navProfile.setOnClickListener(v -> updateNavUI(3));
         
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
             startActivity(new Intent(this, LoginActivity.class));
@@ -124,36 +117,11 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void moveIndicator(int position) {
-        float screenWidth = getResources().getDisplayMetrics().widthPixels;
-        float itemWidth = screenWidth / 4;
-        
-        float targetXIndicator = (itemWidth * position) + (itemWidth / 2) - (activeIndicator.getWidth() / 2f);
-        float targetXCurve = (itemWidth * position) + (itemWidth / 2) - (navCurve.getWidth() / 2f);
-
-        activeIndicator.animate()
-                .translationX(targetXIndicator)
-                .setDuration(300)
-                .start();
-
-        navCurve.animate()
-                .translationX(targetXCurve)
-                .setDuration(300)
-                .start();
-
-        updateNavUI(position);
-    }
-
     private void updateNavUI(int position) {
         int grey = ContextCompat.getColor(this, R.color.text_grey);
         int blue = ContextCompat.getColor(this, R.color.button_blue);
 
-        // Reset
-        ivHome.setVisibility(View.VISIBLE);
-        ivHistory.setVisibility(View.VISIBLE);
-        ivSettings.setVisibility(View.VISIBLE);
-        ivProfile.setVisibility(View.VISIBLE);
-        
+        // Reset all to grey/normal
         ivHome.setColorFilter(grey);
         ivHistory.setColorFilter(grey);
         ivSettings.setColorFilter(grey);
@@ -169,29 +137,25 @@ public class ProfileActivity extends AppCompatActivity {
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvProfile.setTypeface(null, android.graphics.Typeface.NORMAL);
 
-        // Active
+        // Set active item to blue/bold
         switch (position) {
             case 0:
-                ivActiveIcon.setImageResource(R.drawable.ic_home);
-                ivHome.setVisibility(View.GONE);
+                ivHome.setColorFilter(blue);
                 tvHome.setTextColor(blue);
                 tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 1:
-                ivActiveIcon.setImageResource(R.drawable.ic_history);
-                ivHistory.setVisibility(View.GONE);
+                ivHistory.setColorFilter(blue);
                 tvHistory.setTextColor(blue);
                 tvHistory.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 2:
-                ivActiveIcon.setImageResource(R.drawable.ic_settings);
-                ivSettings.setVisibility(View.GONE);
+                ivSettings.setColorFilter(blue);
                 tvSettings.setTextColor(blue);
                 tvSettings.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
             case 3:
-                ivActiveIcon.setImageResource(R.drawable.ic_person);
-                ivProfile.setVisibility(View.GONE);
+                ivProfile.setColorFilter(blue);
                 tvProfile.setTextColor(blue);
                 tvProfile.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;

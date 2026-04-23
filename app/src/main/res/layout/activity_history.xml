@@ -20,7 +20,7 @@
             android:id="@+id/btnMenu"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:cardBackgroundColor="#DCEEFA"
+            app:cardBackgroundColor="@color/posisi_box_bg"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -73,7 +73,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="8dp"
-                app:cardBackgroundColor="#DCEEFA"
+                app:cardBackgroundColor="@color/posisi_box_bg"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
                 <ImageView
@@ -88,7 +88,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardBackgroundColor="#DCEEFA"
+                app:cardBackgroundColor="@color/posisi_box_bg"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
                 <ImageView
@@ -129,6 +129,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/filterAll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/button_background"
@@ -139,6 +140,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/filterLaundry"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -149,6 +151,7 @@
                         android:textColor="@color/text_grey" />
 
                     <TextView
+                        android:id="@+id/filterRain"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -159,6 +162,7 @@
                         android:textColor="@color/text_grey" />
 
                     <TextView
+                        android:id="@+id/filterSensor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -178,7 +182,7 @@
                 android:text="@string/hist_stats_weekly"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                app:drawableStartCompat="@android:drawable/ic_menu_sort_alphabetically"
+                app:drawableStartCompat="@drawable/ic_trending_up"
                 app:drawableTint="@color/button_blue" />
 
             <GridLayout
@@ -193,7 +197,7 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/white"
+                    app:cardBackgroundColor="@color/card_white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
                     <LinearLayout
@@ -205,7 +209,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_laundry"
+                            android:src="@drawable/ic_hanger"
                             android:contentDescription="@null"
                             app:tint="@color/button_blue" />
                         <TextView
@@ -230,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/white"
+                    app:cardBackgroundColor="@color/card_white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
                     <LinearLayout
@@ -267,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/white"
+                    app:cardBackgroundColor="@color/card_white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
                     <LinearLayout
@@ -304,7 +308,7 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/white"
+                    app:cardBackgroundColor="@color/card_white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
                     <LinearLayout
@@ -316,7 +320,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_sort_alphabetically"
+                            android:src="@drawable/ic_trending_up"
                             android:contentDescription="@null"
                             app:tint="@color/button_blue" />
                         <TextView
@@ -351,6 +355,7 @@
 
             <!-- Days Section and Items -->
             <TextView
+                android:id="@+id/headerToday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -363,10 +368,11 @@
 
             <!-- Item: Jemuran Dikeluarkan -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/itemLaundry1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/card_white"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -437,6 +443,7 @@
 
             <!-- KEMARIN -->
             <TextView
+                android:id="@+id/headerYesterday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -447,11 +454,13 @@
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
+            <!-- Item: Hujan Terdeteksi -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/itemRain1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/card_white"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -459,7 +468,7 @@
                     android:layout_height="wrap_content"
                     android:padding="16dp">
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/cvIcon2"
+                        android:id="@+id/cvIconRain"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         app:cardBackgroundColor="#FFF3E0"
@@ -475,39 +484,374 @@
                             app:tint="@color/button_orange" />
                     </androidx.cardview.widget.CardView>
                     <TextView
-                        android:id="@+id/tvTime2"
+                        android:id="@+id/tvTimeRain"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="16:45 WITA"
                         android:textColor="@color/text_grey"
                         android:textSize="10sp"
-                        app:layout_constraintStart_toEndOf="@id/cvIcon2"
-                        app:layout_constraintTop_toTopOf="@id/cvIcon2" />
+                        app:layout_constraintStart_toEndOf="@id/cvIconRain"
+                        app:layout_constraintTop_toTopOf="@id/cvIconRain" />
                     <TextView
+                        android:id="@+id/tvTitleRain"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/hist_item_rain_detected"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/tvTime2"
-                        app:layout_constraintTop_toBottomOf="@id/tvTime2" />
+                        app:layout_constraintStart_toStartOf="@id/tvTimeRain"
+                        app:layout_constraintTop_toBottomOf="@id/tvTimeRain" />
+                    <TextView
+                        android:id="@+id/tvDescRain"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/hist_item_rain_desc"
+                        android:textColor="@color/text_grey"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvTitleRain"
+                        app:layout_constraintTop_toBottomOf="@id/tvTitleRain" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/posisi_box_background"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/badge_system"
+                        android:textColor="@color/button_blue"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="@id/tvDescRain"
+                        app:layout_constraintTop_toBottomOf="@id/tvDescRain" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
-            <TextView
+            <!-- Item: Jemuran Masuk Otomatis -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/itemLaundry2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/posisi_box_background"
-                android:padding="12dp"
-                android:text="@string/hist_2days_ago"
-                android:textColor="@color/text_grey"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/card_white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cvIconIn"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        app:cardBackgroundColor="#FFEBEE"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_hanger"
+                            app:tint="#F44336" />
+                    </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:id="@+id/tvTimeIn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="16:42 WITA"
+                        android:textColor="@color/text_grey"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toEndOf="@id/cvIconIn"
+                        app:layout_constraintTop_toTopOf="@id/cvIconIn" />
+                    <TextView
+                        android:id="@+id/tvTitleIn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hist_item_in_auto"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvTimeIn"
+                        app:layout_constraintTop_toBottomOf="@id/tvTimeIn" />
+                    <TextView
+                        android:id="@+id/tvDescIn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/hist_item_in_desc"
+                        android:textColor="@color/text_grey"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvTitleIn"
+                        app:layout_constraintTop_toBottomOf="@id/tvTitleIn" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/posisi_box_background"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/badge_auto"
+                        android:textColor="@color/button_blue"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="@id/tvDescIn"
+                        app:layout_constraintTop_toBottomOf="@id/tvDescIn" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Item: Jemuran Dikeluarkan -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/itemLaundry3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/card_white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cvIconOut"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        app:cardBackgroundColor="#E8F5E9"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_arrow_upward"
+                            app:tint="#4CAF50" />
+                    </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:id="@+id/tvTimeOut"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="09:20 WITA"
+                        android:textColor="@color/text_grey"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toEndOf="@id/cvIconOut"
+                        app:layout_constraintTop_toTopOf="@id/cvIconOut" />
+                    <TextView
+                        android:id="@+id/tvTitleOut"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hist_item_out_title"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvTimeOut"
+                        app:layout_constraintTop_toBottomOf="@id/tvTimeOut" />
+                    <TextView
+                        android:id="@+id/tvDescOut"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/hist_item_out_manual"
+                        android:textColor="@color/text_grey"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvTitleOut"
+                        app:layout_constraintTop_toBottomOf="@id/tvTitleOut" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/posisi_box_background"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/badge_manual"
+                        android:textColor="@color/button_blue"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="@id/tvDescOut"
+                        app:layout_constraintTop_toBottomOf="@id/tvDescOut" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Hidden Content for Load More -->
+            <LinearLayout
+                android:id="@+id/llHiddenHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/header2DaysAgo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/posisi_box_background"
+                    android:padding="12dp"
+                    android:text="@string/hist_2days_ago"
+                    android:textColor="@color/text_grey"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <!-- Item: Sensor Cahaya Aktif -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/itemSensor1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="@color/card_white"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp">
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp">
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cvIconLight"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardBackgroundColor="#E3F2FD"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="12dp"
+                                android:src="@drawable/ic_settings"
+                                app:tint="@color/button_blue" />
+                        </androidx.cardview.widget.CardView>
+                        <TextView
+                            android:id="@+id/tvTimeLight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="14:30 WITA"
+                            android:textColor="@color/text_grey"
+                            android:textSize="10sp"
+                            app:layout_constraintStart_toEndOf="@id/cvIconLight"
+                            app:layout_constraintTop_toTopOf="@id/cvIconLight" />
+                        <TextView
+                            android:id="@+id/tvTitleLight"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/hist_item_sensor_light"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/tvTimeLight"
+                            app:layout_constraintTop_toBottomOf="@id/tvTimeLight" />
+                        <TextView
+                            android:id="@+id/tvDescLight"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/hist_item_sensor_desc"
+                            android:textColor="@color/text_grey"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/tvTitleLight"
+                            app:layout_constraintTop_toBottomOf="@id/tvTitleLight" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/posisi_box_background"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:text="@string/badge_system"
+                            android:textColor="@color/button_blue"
+                            android:textSize="10sp"
+                            app:layout_constraintStart_toStartOf="@id/tvDescLight"
+                            app:layout_constraintTop_toBottomOf="@id/tvDescLight" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Item: Jemuran Dikeluarkan Pagi -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/itemLaundry4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="@color/card_white"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp">
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp">
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cvIconOut2"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardBackgroundColor="#E8F5E9"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="12dp"
+                                android:src="@drawable/ic_arrow_upward"
+                                app:tint="#4CAF50" />
+                        </androidx.cardview.widget.CardView>
+                        <TextView
+                            android:id="@+id/tvTimeOut2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="08:00 WITA"
+                            android:textColor="@color/text_grey"
+                            android:textSize="10sp"
+                            app:layout_constraintStart_toEndOf="@id/cvIconOut2"
+                            app:layout_constraintTop_toTopOf="@id/cvIconOut2" />
+                        <TextView
+                            android:id="@+id/tvTitleOut2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/hist_item_out_title"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/tvTimeOut2"
+                            app:layout_constraintTop_toBottomOf="@id/tvTimeOut2" />
+                        <TextView
+                            android:id="@+id/tvDescOut2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/hist_item_morning_out"
+                            android:textColor="@color/text_grey"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/tvTitleOut2"
+                            app:layout_constraintTop_toBottomOf="@id/tvTitleOut2" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/posisi_box_background"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:text="@string/badge_manual"
+                            android:textColor="@color/button_blue"
+                            android:textSize="10sp"
+                            app:layout_constraintStart_toStartOf="@id/tvDescOut2"
+                            app:layout_constraintTop_toBottomOf="@id/tvDescOut2" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
             <Button
+                android:id="@+id/btnLoadMore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
@@ -524,56 +868,24 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNavContainer"
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="75dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Background Putih Bar dengan Border Atas -->
+        <!-- Background Putih Bar -->
         <View
             android:id="@+id/bottomNavBg"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:background="@drawable/nav_glow"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <!-- Indikator Lingkaran Biru (Active Circle) -->
-        <View
-            android:id="@+id/navCurve"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:background="@drawable/nav_curve_bg"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/activeIndicator"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            app:cardBackgroundColor="@color/button_blue"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="4dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.375"
-            android:layout_marginTop="5dp">
-
-            <ImageView
-                android:id="@+id/ivActiveIcon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
-                android:src="@drawable/ic_history"
-                android:contentDescription="@null"
-                app:tint="@color/white" />
-        </androidx.cardview.widget.CardView>
+            android:layout_height="match_parent"
+            android:background="@color/card_white"
+            android:elevation="8dp" />
 
         <!-- Menu Items -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:weightSum="4"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:elevation="9dp"
+            android:weightSum="4">
 
             <LinearLayout
                 android:id="@+id/navHome"
@@ -593,7 +905,7 @@
                     android:id="@+id/tvHome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Beranda"
+                    android:text="@string/nav_home"
                     android:textColor="@color/text_grey"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -611,13 +923,12 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_history"
                     android:contentDescription="@null"
-                    app:tint="@color/text_grey"
-                    android:visibility="invisible" />
+                    app:tint="@color/button_blue" />
                 <TextView
                     android:id="@+id/tvHistory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Riwayat"
+                    android:text="@string/nav_history"
                     android:textColor="@color/button_blue"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -641,7 +952,7 @@
                     android:id="@+id/tvSettings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pengaturan"
+                    android:text="@string/nav_settings"
                     android:textColor="@color/text_grey"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -664,7 +975,7 @@
                     android:id="@+id/tvProfile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Profil"
+                    android:text="@string/nav_profile"
                     android:textColor="@color/text_grey"
                     android:textSize="10sp" />
             </LinearLayout>
