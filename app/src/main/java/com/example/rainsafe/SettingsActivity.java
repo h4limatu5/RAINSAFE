@@ -156,11 +156,15 @@ public class SettingsActivity extends AppCompatActivity {
         swDarkMode.setOnCheckedChangeListener((v, isChecked) -> {
             if (v.isPressed()) {
                 saveSetting("dark_mode", isChecked);
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                }
+                
+                // Delay sedikit untuk memberikan feedback visual pada switch sebelum recreate
+                v.postDelayed(() -> {
+                    if (isChecked) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    }
+                }, 150);
             }
         });
 

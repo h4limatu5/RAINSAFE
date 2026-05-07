@@ -186,10 +186,10 @@ public class DashboardActivity extends AppCompatActivity {
         boolean isAutoMode = prefs.getBoolean("auto_mode", true);
         if (ivAutoIcon != null && cvAutoIcon != null) {
             if (isAutoMode) {
-                cvAutoIcon.setCardBackgroundColor(android.graphics.Color.parseColor("#BDE2F9"));
-                ivAutoIcon.setColorFilter(ContextCompat.getColor(this, R.color.black));
+                cvAutoIcon.setCardBackgroundColor(ContextCompat.getColor(this, R.color.button_blue));
+                ivAutoIcon.setColorFilter(ContextCompat.getColor(this, R.color.white));
             } else {
-                cvAutoIcon.setCardBackgroundColor(android.graphics.Color.parseColor("#EEEEEE"));
+                cvAutoIcon.setCardBackgroundColor(ContextCompat.getColor(this, R.color.input_bg));
                 ivAutoIcon.setColorFilter(ContextCompat.getColor(this, R.color.text_grey));
             }
         }
