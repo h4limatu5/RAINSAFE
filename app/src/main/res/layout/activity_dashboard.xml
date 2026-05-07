@@ -208,6 +208,7 @@
                         app:layout_constraintTop_toBottomOf="@id/llLocation" />
 
                     <TextView
+                        android:id="@+id/tvWeatherDesc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/dash_weather_desc"
@@ -874,6 +875,57 @@
                                     android:textStyle="bold" />
                                 <TextView
                                     android:id="@+id/tvSensorLightStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawablePadding="4dp"
+                                    android:text="@string/dash_sensor_active"
+                                    android:textColor="#4CAF50"
+                                    android:textSize="12sp"
+                                    app:drawableStartCompat="@drawable/indicator_active"
+                                    app:drawableTint="#4CAF50" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="@color/bg_dashboard"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="12dp">
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                app:cardBackgroundColor="#E6F2FF"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp">
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="12dp"
+                                    android:src="@drawable/ic_settings"
+                                    android:contentDescription="@null"
+                                    app:tint="@color/button_blue" />
+                            </androidx.cardview.widget.CardView>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/dash_sensor_temp"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:id="@+id/tvSensorTempStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:drawablePadding="4dp"

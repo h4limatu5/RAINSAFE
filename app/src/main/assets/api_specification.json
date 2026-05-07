@@ -1,0 +1,95 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FakeStoreAPI",
+    "description": "A free fake API for testing and prototyping e-commerce applications.",
+    "version": "v2.1.11",
+    "contact": {
+      "email": "support@fakestoreapi.com",
+      "url": "https://fakestoreapi.com/docs"
+    },
+    "x-logo": {
+      "url": "/icons/logo.png",
+      "href": "/"
+    }
+  },
+  "tags": [
+    {
+      "name": "Products",
+      "x-displayName": "🛒 Products"
+    },
+    {
+      "name": "Carts",
+      "x-displayName": "🛍️ Carts"
+    },
+    {
+      "name": "Users",
+      "x-displayName": "👤 Users"
+    },
+    {
+      "name": "Auth",
+      "x-displayName": "🔒 Auth"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://fakestoreapi.com"
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "Get all products",
+        "description": "Retrieve a list of all available products.",
+        "operationId": "getAllProducts",
+        "tags": [
+          "Products"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

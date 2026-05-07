@@ -60,9 +60,9 @@
             android:padding="24dp">
 
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginTop="32dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="24dp"
                 android:src="@drawable/ic_rainy"
                 android:contentDescription="@string/desc_logo"
                 app:tint="@color/button_blue" />
@@ -70,18 +70,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:text="@string/welcome_app_name"
                 android:textColor="@color/button_blue"
-                android:textSize="28sp"
+                android:textSize="32sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/welcome_app_subtitle"
+                android:text="@string/about_app_slogan"
                 android:textColor="@color/text_grey"
-                android:textSize="14sp" />
+                android:textSize="16sp"
+                android:letterSpacing="0.1" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -151,6 +152,27 @@
                             android:textStyle="bold" />
                     </LinearLayout>
 
+                    <!-- Team Members Info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_team_label"
+                            android:textColor="@color/text_grey" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/about_team_members"
+                            android:textColor="@color/black"
+                            android:textSize="13sp"
+                            android:lineSpacingExtra="2dp" />
+                    </LinearLayout>
+
                     <!-- Website Info -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -163,11 +185,14 @@
                             android:text="@string/about_website_label"
                             android:textColor="@color/text_grey" />
                         <TextView
+                            android:id="@+id/tvWebsite"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/about_website_val"
                             android:textColor="@color/button_blue"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:clickable="true"
+                            android:focusable="true" />
                     </LinearLayout>
 
                 </LinearLayout>

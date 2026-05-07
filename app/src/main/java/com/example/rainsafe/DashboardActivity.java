@@ -24,7 +24,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     // Real-time Views
     private TextView tvRainProbVal, tvCurrentDuration, tvStatsTotalDuration;
-    private TextView tvSensorRainStatus, tvSensorLightStatus;
+    private TextView tvSensorRainStatus, tvSensorLightStatus, tvSensorTempStatus;
     private View notificationDot;
     private ImageView ivAutoIcon;
     private CardView cvAutoIcon;
@@ -65,6 +65,7 @@ public class DashboardActivity extends AppCompatActivity {
         tvStatsTotalDuration = findViewById(R.id.tvStatsTotalDuration);
         tvSensorRainStatus = findViewById(R.id.tvSensorRainStatus);
         tvSensorLightStatus = findViewById(R.id.tvSensorLightStatus);
+        tvSensorTempStatus = findViewById(R.id.tvSensorTempStatus);
         notificationDot = findViewById(R.id.notificationDot);
         ivAutoIcon = findViewById(R.id.ivAutoIcon);
         cvAutoIcon = findViewById(R.id.cvAutoIcon);
@@ -140,12 +141,43 @@ public class DashboardActivity extends AppCompatActivity {
         updateRunnable = new Runnable() {
             @Override
             public void run() {
+                simulateSensorChanges();
                 updateSensorUI();
                 // Schedule next update in 3 seconds
                 handler.postDelayed(this, 3000);
             }
         };
         handler.post(updateRunnable);
+    }
+
+    private void simulateSensorChanges() {
+        Random random = new Random();
+        
+        // Simulate Rain Sensor (0-100%)
+        int rainVal = random.nextInt(100);
+        String rainStatus = rainVal > 50 ? "Hujan" : "Aman";
+        dbHelper.updateSensorData("Sensor Hujan", String.valueOf(rainVal), rainStatus);
+        
+        // Simulate Light Sensor (0-2000 lux)
+        int lightVal = random.nextInt(2000);
+        String lightStatus = lightVal > 1000 ? "Terik" : (lightVal > 300 ? "Cerah" : "Mendung");
+        dbHelper.updateSensorData("Sensor Cahaya", String.valueOf(lightVal), lightStatus);
+
+        // Simulate Temperature Sensor (20-40 °C)
+        int tempVal = 20 + random.nextInt(20);
+        String tempStatus = tempVal > 30 ? "Panas" : (tempVal > 25 ? "Hangat" : "Sejuk");
+        dbHelper.updateSensorData("Sensor Suhu", String.valueOf(tempVal), tempStatus);
+
+        // Update Dashboard Main Temperature/Weather (Optional Simulation)
+        TextView tvTemp = findViewById(R.id.tvBigTemp);
+        TextView tvWeatherDesc = findViewById(R.id.tvWeatherDesc);
+        if (tvTemp != null) {
+            int temp = 25 + random.nextInt(10);
+            tvTemp.setText(temp + " °C");
+        }
+        if (tvWeatherDesc != null) {
+            tvWeatherDesc.setText(rainStatus.equals("Hujan") ? "Hujan Berawan" : "Cerah Berawan");
+        }
     }
 
     private void updateSensorUI() {
@@ -176,6 +208,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Fetch from Database
         Map<String, String> rainData = dbHelper.getLatestSensorData("Sensor Hujan");
         Map<String, String> lightData = dbHelper.getLatestSensorData("Sensor Cahaya");
+        Map<String, String> tempData = dbHelper.getLatestSensorData("Sensor Suhu");
 
         if (!rainData.isEmpty()) {
             tvRainProbVal.setText(rainData.get("value") + rainData.get("unit"));
@@ -197,6 +230,10 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (!lightData.isEmpty()) {
             tvSensorLightStatus.setText(lightData.get("status"));
+        }
+
+        if (!tempData.isEmpty()) {
+            tvSensorTempStatus.setText(tempData.get("status") + " (" + tempData.get("value") + "°C)");
         }
     }
 

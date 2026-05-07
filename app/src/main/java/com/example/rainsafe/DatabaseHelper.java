@@ -17,7 +17,7 @@ import java.util.Map;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RainSafe.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     // Table Users
     public static final String TABLE_USERS = "users";
@@ -26,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_PASSWORD = "password";
+    public static final String COLUMN_PHOTO = "profile_photo"; // Path to image file or base64
 
     // Table Activity Logs
     public static final String TABLE_LOGS = "activity_logs";
@@ -51,7 +52,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_FULLNAME + " TEXT, " +
                     COLUMN_EMAIL + " TEXT UNIQUE, " +
                     COLUMN_PHONE + " TEXT, " +
-                    COLUMN_PASSWORD + " TEXT);";
+                    COLUMN_PASSWORD + " TEXT, " +
+                    COLUMN_PHOTO + " TEXT);";
 
     private static final String TABLE_CREATE_LOGS =
             "CREATE TABLE " + TABLE_LOGS + " (" +
@@ -95,6 +97,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(TABLE_CREATE_SENSORS);
             insertInitialSensorData(db);
         }
+        if (oldVersion < 4) {
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_PHOTO + " TEXT");
+            } catch (Exception e) {
+                // Column might already exist
+            }
+        }
+        if (oldVersion < 5) {
+            addSensorData(db, "Sensor Suhu", "27", "°C", "Aktif");
+        }
     }
 
     private void insertInitialLogs(SQLiteDatabase db) {
@@ -124,6 +136,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         addSensorData(db, "Sensor Hujan", "5", "%", "Aktif");
         addSensorData(db, "Sensor Cahaya", "800", "lux", "Aktif");
         addSensorData(db, "Sensor Kelembaban", "65", "%", "Aktif");
+        addSensorData(db, "Sensor Suhu", "27", "°C", "Aktif");
     }
 
     public void addLog(String title, String desc, String type, String icon) {
@@ -197,6 +210,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             userData.put("fullname", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FULLNAME)));
             userData.put("email", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)));
             userData.put("phone", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE)));
+            userData.put("photo", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHOTO)));
         }
         cursor.close();
         return userData;
@@ -212,9 +226,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             userData.put("fullname", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FULLNAME)));
             userData.put("email", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)));
             userData.put("phone", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE)));
+            userData.put("photo", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHOTO)));
         }
         cursor.close();
         return userData;
+    }
+
+    // Method to update user profile
+    public boolean updateUserProfile(String oldEmail, String fullname, String newEmail, String phone, String photoPath) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_FULLNAME, fullname);
+        values.put(COLUMN_EMAIL, newEmail);
+        values.put(COLUMN_PHONE, phone);
+        if (photoPath != null) {
+            values.put(COLUMN_PHOTO, photoPath);
+        }
+
+        int result = db.update(TABLE_USERS, values, COLUMN_EMAIL + " = ?", new String[]{oldEmail});
+        return result > 0;
     }
 
     // Method to update password (Forgot Password)
@@ -225,6 +255,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int result = db.update(TABLE_USERS, contentValues, COLUMN_EMAIL + " = ?", new String[]{email});
         return result > 0;
+    }
+
+    public void updateSensorData(String name, String value, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SENSOR_VALUE, value);
+        values.put(COLUMN_SENSOR_STATUS, status);
+        values.put(COLUMN_SENSOR_TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+        db.update(TABLE_SENSORS, values, COLUMN_SENSOR_NAME + " = ?", new String[]{name});
     }
 
     // Method to get all logs

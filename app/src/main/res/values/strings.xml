@@ -115,6 +115,7 @@
     <string name="dash_sensor_rain">Sensor Hujan</string>
     <string name="dash_sensor_light">Sensor Cahaya</string>
     <string name="dash_sensor_hum">Sensor Kelembaban</string>
+    <string name="dash_sensor_temp">Sensor Suhu</string>
     <string name="dash_sensor_active">Aktif</string>
 
     <!-- History Screen -->
@@ -206,13 +207,16 @@
 
     <!-- About App Screen -->
     <string name="about_title">Tentang Aplikasi</string>
-    <string name="about_app_description">RainSafe adalah solusi cerdas untuk manajemen jemuran Anda. Menggunakan teknologi IoT terkini, kami membantu melindungi pakaian Anda dari hujan secara otomatis.</string>
+    <string name="about_app_description">RainSafe adalah solusi cerdas berbasis IoT untuk manajemen jemuran otomatis. Dilengkapi dengan sensor hujan, cahaya, dan suhu untuk memastikan pakaian Anda tetap kering dan aman dari cuaca yang tidak menentu.</string>
+    <string name="about_app_slogan">Intelligence in Every Drop</string>
     <string name="about_version_label">Versi Aplikasi</string>
-    <string name="about_version_val">1.0.0 (Stable)</string>
-    <string name="about_developer_label">Dikembangkan Oleh</string>
-    <string name="about_developer_val">RainSafe Team @ 2024</string>
-    <string name="about_website_label">Kunjungi Website</string>
-    <string name="about_website_val">www.rainsafe.com</string>
+    <string name="about_version_val">1.2.0 (Stable)</string>
+    <string name="about_developer_label">Tim Pengembang</string>
+    <string name="about_developer_val">RainSafe IoT Specialists</string>
+    <string name="about_team_label">Anggota Tim</string>
+    <string name="about_team_members">1. Ahmad Ridho (Lead IoT)\n2. Siti Aminah (App Developer)\n3. Budi Santoso (Hardware Eng.)</string>
+    <string name="about_website_label">Official Website</string>
+    <string name="about_website_val">https://rainsafe-iot.github.io</string>
     <string name="desc_logo">RainSafe Logo</string>
 
     <!-- Login Messages -->

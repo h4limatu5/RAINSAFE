@@ -1,22 +1,33 @@
 package com.example.rainsafe;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
+    private static final int PICK_IMAGE = 1;
     private LinearLayout navHome, navHistory, navSettings, navProfile;
-    private ImageView ivHome, ivHistory, ivSettings, ivProfile;
+    private ImageView ivHome, ivHistory, ivSettings, ivProfile, ivProfilePicture;
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
     private TextView tvProfileName, tvProfileEmail, tvProfilePhone;
+    private EditText etFormName, etFormEmail, etFormPhone;
     private DatabaseHelper dbHelper;
+    private String currentPhotoPath = null;
+    private String userEmail = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +40,23 @@ public class ProfileActivity extends AppCompatActivity {
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
         tvProfilePhone = findViewById(R.id.tvProfilePhone);
+        ivProfilePicture = findViewById(R.id.ivProfilePicture);
+
+        // Initialize Form Views
+        etFormName = findViewById(R.id.etFormName);
+        etFormEmail = findViewById(R.id.etFormEmail);
+        etFormPhone = findViewById(R.id.etFormPhone);
 
         // Load User Data
         loadUserData();
+
+        // Change Profile Handlers
+        if (ivProfilePicture.getParent() instanceof View) {
+            ((View) ivProfilePicture.getParent()).setOnClickListener(v -> openGallery());
+        }
+        findViewById(R.id.btnChangePhotoVisible).setOnClickListener(v -> openGallery());
+        
+        findViewById(R.id.btnSaveForm).setOnClickListener(v -> saveProfileChanges());
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
@@ -100,7 +125,7 @@ public class ProfileActivity extends AppCompatActivity {
         String loginType = getIntent().getStringExtra("LOGIN_TYPE");
 
         if (identifier != null && loginType != null) {
-            java.util.Map<String, String> userData;
+            Map<String, String> userData;
             if (loginType.equals("email")) {
                 userData = dbHelper.getUserData(identifier);
             } else {
@@ -108,13 +133,139 @@ public class ProfileActivity extends AppCompatActivity {
             }
 
             if (!userData.isEmpty()) {
+                userEmail = userData.get("email"); // Store current email for updates
                 tvProfileName.setText(userData.get("fullname"));
                 tvProfileEmail.setText(userData.get("email"));
                 if (tvProfilePhone != null) {
                     tvProfilePhone.setText(userData.get("phone"));
                 }
+                
+                String photoPath = userData.get("photo");
+                if (photoPath != null && !photoPath.isEmpty()) {
+                    try {
+                        Uri photoUri = Uri.parse(photoPath);
+                        ivProfilePicture.setImageURI(photoUri);
+                        ivProfilePicture.setColorFilter(null);
+                        ivProfilePicture.setImageTintList(null);
+                        currentPhotoPath = photoPath;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Populate Form
+                etFormName.setText(userData.get("fullname"));
+                etFormEmail.setText(userData.get("email"));
+                etFormPhone.setText(userData.get("phone"));
             }
         }
+    }
+
+    private void saveProfileChanges() {
+        String newName = etFormName.getText().toString().trim();
+        String newEmail = etFormEmail.getText().toString().trim();
+        String newPhone = etFormPhone.getText().toString().trim();
+
+        if (newName.isEmpty() || newEmail.isEmpty() || newPhone.isEmpty()) {
+            Toast.makeText(this, "Semua kolom harus diisi", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean success = dbHelper.updateUserProfile(userEmail, newName, newEmail, newPhone, currentPhotoPath);
+        if (success) {
+            userEmail = newEmail; // Update local reference
+            tvProfileName.setText(newName);
+            tvProfileEmail.setText(newEmail);
+            tvProfilePhone.setText(newPhone);
+            Toast.makeText(this, "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Gagal memperbarui profil", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                try {
+                    // Request permanent access to the URI
+                    try {
+                        getContentResolver().takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } catch (SecurityException se) {
+                        se.printStackTrace();
+                    }
+
+                    currentPhotoPath = imageUri.toString();
+                    ivProfilePicture.setImageURI(imageUri);
+                    ivProfilePicture.setColorFilter(null);
+                    ivProfilePicture.setImageTintList(null);
+
+                    // Save to DB immediately if we have a valid identifier
+                    if (userEmail != null && !userEmail.isEmpty()) {
+                        String name = etFormName.getText().toString();
+                        String phone = etFormPhone.getText().toString();
+                        boolean success = dbHelper.updateUserProfile(userEmail, name, userEmail, phone, currentPhotoPath);
+                        if (success) {
+                            Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Gagal menyimpan foto ke database", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "Foto dipilih, klik Simpan untuk memperbarui", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Gagal memproses foto", Toast.LENGTH_SHORT).show();
+                    
+                    // Fallback
+                    ivProfilePicture.setImageURI(imageUri);
+                    ivProfilePicture.setColorFilter(null);
+                    currentPhotoPath = imageUri.toString();
+                }
+            }
+        }
+    }
+
+    private void showEditDialog(String title, String currentValue, String field) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ubah " + title);
+
+        final EditText input = new EditText(this);
+        input.setText(currentValue);
+        builder.setView(input);
+
+        builder.setPositiveButton("Simpan", (dialog, which) -> {
+            String newValue = input.getText().toString();
+            if (newValue.isEmpty()) {
+                Toast.makeText(this, "Tidak boleh kosong", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            boolean success = false;
+            if (field.equals("fullname")) {
+                success = dbHelper.updateUserProfile(userEmail, newValue, userEmail, tvProfilePhone.getText().toString(), currentPhotoPath);
+                if (success) tvProfileName.setText(newValue);
+            } else if (field.equals("phone")) {
+                success = dbHelper.updateUserProfile(userEmail, tvProfileName.getText().toString(), userEmail, newValue, currentPhotoPath);
+                if (success) tvProfilePhone.setText(newValue);
+            }
+
+            if (success) {
+                Toast.makeText(this, title + " diperbarui", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Batal", (dialog, which) -> dialog.cancel());
+        builder.show();
     }
 
     private void updateNavUI(int position) {
