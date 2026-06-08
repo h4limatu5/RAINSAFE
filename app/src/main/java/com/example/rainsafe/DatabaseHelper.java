@@ -136,7 +136,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         addSensorData(db, "Sensor Hujan", "5", "%", "Aktif");
         addSensorData(db, "Sensor Cahaya", "800", "lux", "Aktif");
         addSensorData(db, "Sensor Kelembaban", "65", "%", "Aktif");
-        addSensorData(db, "Sensor Suhu", "27", "°C", "Aktif");
     }
 
     public void addLog(String title, String desc, String type, String icon) {
@@ -292,6 +291,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void clearAllLogs() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_LOGS, null, null);
+    }
+
+    public void deleteLog(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_LOGS, COLUMN_LOG_ID + "=?", new String[]{String.valueOf(id)});
     }
 
     // Method to get latest sensor readings

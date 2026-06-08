@@ -29,9 +29,24 @@ public class FirebaseSyncHelper {
     }
 
     public void syncUsers() {
-        // Karena kita tidak punya method getAllUsers di DatabaseHelper, 
-        // kita bisa menambahkan logic sync saat user login atau update profil saja 
-        // untuk menghemat bandwidth.
+        // Implementation for syncing a specific user
+    }
+
+    public void syncUserProfile(String email, String name, String phone, String photoPath) {
+        if (email == null || email.isEmpty()) return;
+        
+        // Use email as key (replace dots with commas as Firebase doesn't allow dots in keys)
+        String userKey = email.replace(".", ",");
+        Map<String, Object> userMap = new java.util.HashMap<>();
+        userMap.put("email", email);
+        userMap.put("name", name);
+        userMap.put("phone", phone);
+        userMap.put("photoPath", photoPath);
+        userMap.put("lastUpdated", System.currentTimeMillis());
+
+        mDatabase.child("users").child(userKey).setValue(userMap)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "User profile " + email + " synced"))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to sync user profile " + email, e));
     }
 
     public void syncLogs() {
@@ -47,7 +62,7 @@ public class FirebaseSyncHelper {
     }
 
     public void syncSensors() {
-        String[] sensors = {"Sensor Hujan", "Sensor Cahaya", "Sensor Kelembaban", "Sensor Suhu"};
+        String[] sensors = {"Sensor Hujan", "Sensor Cahaya", "Sensor Kelembaban"};
         for (String name : sensors) {
             Map<String, String> data = dbHelper.getLatestSensorData(name);
             if (!data.isEmpty()) {

@@ -24,15 +24,19 @@ public class DashboardActivity extends AppCompatActivity {
 
     // Real-time Views
     private TextView tvRainProbVal, tvCurrentDuration, tvStatsTotalDuration;
-    private TextView tvSensorRainStatus, tvSensorLightStatus, tvSensorTempStatus;
+    private TextView tvSensorRainStatus, tvSensorLightStatus;
+    private TextView tvDrynessPercent, tvDrynessEst;
+    private ProgressBar pbDryness;
     private View notificationDot;
     private ImageView ivAutoIcon;
     private CardView cvAutoIcon;
     private boolean isRaining = false;
+    private boolean isDryNotified = false;
     private boolean isLaundryOut = true; // Initial state based on XML
     private long laundryStartTime = System.currentTimeMillis() - (20 * 60 * 1000); // Simulated 20 mins ago
 
     private DatabaseHelper dbHelper;
+    private FirebaseSyncHelper firebaseHelper;
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateRunnable;
 
@@ -42,6 +46,7 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         dbHelper = new DatabaseHelper(this);
+        firebaseHelper = new FirebaseSyncHelper(this);
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
@@ -65,7 +70,9 @@ public class DashboardActivity extends AppCompatActivity {
         tvStatsTotalDuration = findViewById(R.id.tvStatsTotalDuration);
         tvSensorRainStatus = findViewById(R.id.tvSensorRainStatus);
         tvSensorLightStatus = findViewById(R.id.tvSensorLightStatus);
-        tvSensorTempStatus = findViewById(R.id.tvSensorTempStatus);
+        tvDrynessPercent = findViewById(R.id.tv_val_dry_percent); // Make sure these IDs match activity_dashboard.xml
+        tvDrynessEst = findViewById(R.id.tv_val_dry_est);
+        pbDryness = findViewById(R.id.pb_dryness);
         notificationDot = findViewById(R.id.notificationDot);
         ivAutoIcon = findViewById(R.id.ivAutoIcon);
         cvAutoIcon = findViewById(R.id.cvAutoIcon);
@@ -97,6 +104,20 @@ public class DashboardActivity extends AppCompatActivity {
         findViewById(R.id.btnNotifications).setOnClickListener(v -> {
             notificationDot.setVisibility(View.GONE);
             startActivity(new Intent(this, NotificationsActivity.class));
+        });
+
+        findViewById(R.id.btnTestNotif).setOnClickListener(v -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    androidx.core.app.ActivityCompat.requestPermissions(this,
+                            new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1004);
+                } else {
+                    showNotificationAlert("RainSafe Test", "Notifikasi berhasil muncul!");
+                }
+            } else {
+                showNotificationAlert("RainSafe Test", "Notifikasi berhasil muncul!");
+            }
         });
 
         // Set Default Position (Home - 0)
@@ -135,6 +156,14 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Setup Real-time Updates
         setupRealTimeUpdates();
+
+        // Start Media Playback Service for Control Center integration
+        Intent mediaIntent = new Intent(this, MediaPlaybackService.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(mediaIntent);
+        } else {
+            startService(mediaIntent);
+        }
     }
 
     private void setupRealTimeUpdates() {
@@ -149,7 +178,6 @@ public class DashboardActivity extends AppCompatActivity {
         };
         handler.post(updateRunnable);
     }
-
     private void simulateSensorChanges() {
         Random random = new Random();
         
@@ -162,11 +190,6 @@ public class DashboardActivity extends AppCompatActivity {
         int lightVal = random.nextInt(2000);
         String lightStatus = lightVal > 1000 ? "Terik" : (lightVal > 300 ? "Cerah" : "Mendung");
         dbHelper.updateSensorData("Sensor Cahaya", String.valueOf(lightVal), lightStatus);
-
-        // Simulate Temperature Sensor (20-40 °C)
-        int tempVal = 20 + random.nextInt(20);
-        String tempStatus = tempVal > 30 ? "Panas" : (tempVal > 25 ? "Hangat" : "Sejuk");
-        dbHelper.updateSensorData("Sensor Suhu", String.valueOf(tempVal), tempStatus);
 
         // Update Dashboard Main Temperature/Weather (Optional Simulation)
         TextView tvTemp = findViewById(R.id.tvBigTemp);
@@ -208,7 +231,6 @@ public class DashboardActivity extends AppCompatActivity {
         // Fetch from Database
         Map<String, String> rainData = dbHelper.getLatestSensorData("Sensor Hujan");
         Map<String, String> lightData = dbHelper.getLatestSensorData("Sensor Cahaya");
-        Map<String, String> tempData = dbHelper.getLatestSensorData("Sensor Suhu");
 
         if (!rainData.isEmpty()) {
             tvRainProbVal.setText(rainData.get("value") + rainData.get("unit"));
@@ -232,9 +254,51 @@ public class DashboardActivity extends AppCompatActivity {
             tvSensorLightStatus.setText(lightData.get("status"));
         }
 
-        if (!tempData.isEmpty()) {
-            tvSensorTempStatus.setText(tempData.get("status") + " (" + tempData.get("value") + "°C)");
+        // Logic to calculate Dryness Percentage based on Light
+        try {
+            int lightVal = 0;
+            if (!lightData.isEmpty()) {
+                lightVal = Integer.parseInt(lightData.get("value"));
+            }
+            
+            // Simple heuristic: Base dryness increases with light (since temp sensor removed)
+            // Using a fixed assumed temp or just light
+            double dryingPower = 15.0 + (lightVal * 0.04); // Adjusted formula
+            
+            if (isLaundryOut && !isRaining) {
+                long elapsedMinutes = (System.currentTimeMillis() - laundryStartTime) / (1000 * 60);
+                int dryness = (int) (elapsedMinutes * (dryingPower / 50.0)); 
+                if (dryness >= 100) {
+                    dryness = 100;
+                    if (!isDryNotified) {
+                        isDryNotified = true;
+                        dbHelper.addLog("Jemuran Kering!", "Pakaian Anda sudah kering 100%. Silakan diambil.", "system", "dry");
+                        showNotificationAlert("Jemuran Selesai!", "Pakaian Anda sudah kering 100%.");
+                    }
+                } else {
+                    isDryNotified = false;
+                }
+                
+                if (tvDrynessPercent != null) tvDrynessPercent.setText(dryness + "%");
+                if (pbDryness != null) pbDryness.setProgress(dryness);
+                
+                // Estimate remaining time
+                if (dryness < 100) {
+                    int remaining = 100 - dryness;
+                    double ratePerMin = dryingPower / 50.0;
+                    int estMins = (int) (remaining / ratePerMin);
+                    if (tvDrynessEst != null) tvDrynessEst.setText(estMins + " mins remaining");
+                } else {
+                    if (tvDrynessEst != null) tvDrynessEst.setText("Fully Dry");
+                }
+            }
+        } catch (Exception e) {
+            // Ignore parse errors
         }
+
+        // Sync to Firebase
+        firebaseHelper.syncSensors();
+        firebaseHelper.syncLogs();
     }
 
     private void sendEmailNotification(String title, String message) {
@@ -260,27 +324,52 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void showNotificationAlert(String title, String message) {
-        // Show Red Dot
+        // Show Red Dot in UI
         notificationDot.setVisibility(View.VISIBLE);
-        
-        // Android System Notification (Optional but good for real-time feel)
+
+        // Check for Notification Permission (Android 13+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1004);
+                return;
+            }
+        }
+
+        // Create Intent to open NotificationsActivity when clicked
+        android.content.Intent intent = new android.content.Intent(this, NotificationsActivity.class);
+        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                this, 0, intent, android.app.PendingIntent.FLAG_IMMUTABLE);
+
+        // Android System Notification
         androidx.core.app.NotificationCompat.Builder builder = new androidx.core.app.NotificationCompat.Builder(this, "RAINSAFE_NOTIF")
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-        
+
         // Create channel for Android O+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            android.app.NotificationChannel channel = new android.app.NotificationChannel("RAINSAFE_NOTIF", "RainSafe Alerts", android.app.NotificationManager.IMPORTANCE_HIGH);
+            android.app.NotificationChannel channel = new android.app.NotificationChannel(
+                    "RAINSAFE_NOTIF",
+                    "RainSafe Alerts",
+                    android.app.NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Notifications for rain and sensor alerts");
+            channel.enableLights(true);
+            channel.setLightColor(android.graphics.Color.RED);
+            channel.enableVibration(true);
             notificationManager.createNotificationChannel(channel);
         }
-        
-        notificationManager.notify(1, builder.build());
-        
+
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+
         // Toast for immediate feedback
         android.widget.Toast.makeText(this, title + "\n" + message, android.widget.Toast.LENGTH_LONG).show();
     }

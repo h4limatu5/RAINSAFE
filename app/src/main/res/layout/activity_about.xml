@@ -18,7 +18,7 @@
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:cardBackgroundColor="#4DFFFFFF"
+            app:cardBackgroundColor="@color/posisi_box_bg"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -110,7 +110,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="20dp"
-                        android:background="#1A000000" />
+                        android:background="@color/tab_line_inactive" />
 
                     <!-- Version Info -->
                     <LinearLayout

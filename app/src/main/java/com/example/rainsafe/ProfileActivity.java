@@ -26,6 +26,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvProfileName, tvProfileEmail, tvProfilePhone;
     private EditText etFormName, etFormEmail, etFormPhone;
     private DatabaseHelper dbHelper;
+    private FirebaseSyncHelper firebaseHelper;
     private String currentPhotoPath = null;
     private String userEmail = null;
 
@@ -35,6 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         dbHelper = new DatabaseHelper(this);
+        firebaseHelper = new FirebaseSyncHelper(this);
 
         // Initialize Profile Views
         tvProfileName = findViewById(R.id.tvProfileName);
@@ -173,6 +175,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         boolean success = dbHelper.updateUserProfile(userEmail, newName, newEmail, newPhone, currentPhotoPath);
         if (success) {
+            // Sync to Firebase
+            firebaseHelper.syncUserProfile(newEmail, newName, newPhone, currentPhotoPath);
+            
             userEmail = newEmail; // Update local reference
             tvProfileName.setText(newName);
             tvProfileEmail.setText(newEmail);
@@ -184,6 +189,22 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void openGallery() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_IMAGES)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.READ_MEDIA_IMAGES}, 1003);
+                return;
+            }
+        } else {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1003);
+                return;
+            }
+        }
+
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
@@ -215,6 +236,7 @@ public class ProfileActivity extends AppCompatActivity {
                         String phone = etFormPhone.getText().toString();
                         boolean success = dbHelper.updateUserProfile(userEmail, name, userEmail, phone, currentPhotoPath);
                         if (success) {
+                            firebaseHelper.syncUserProfile(userEmail, name, phone, currentPhotoPath);
                             Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(this, "Gagal menyimpan foto ke database", Toast.LENGTH_SHORT).show();

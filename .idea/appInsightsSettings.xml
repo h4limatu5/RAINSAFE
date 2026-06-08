@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.rainsafe" />
+                  <option name="mobileSdkAppId" value="1:592905107903:android:0668c8b9bb246f5af4490a" />
+                  <option name="projectId" value="rainsafe-777f2" />
+                  <option name="projectNumber" value="592905107903" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

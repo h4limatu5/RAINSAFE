@@ -31,7 +31,11 @@ public class NotificationsActivity extends AppCompatActivity {
         btnClearAll = findViewById(R.id.btnClearAll);
 
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NotificationAdapter(new ArrayList<>());
+        adapter = new NotificationAdapter(new ArrayList<>(), position -> {
+            NotificationModel notification = adapter.getNotifications().get(position);
+            dbHelper.deleteLog(notification.getId());
+            loadNotifications();
+        });
         rvNotifications.setAdapter(adapter);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());

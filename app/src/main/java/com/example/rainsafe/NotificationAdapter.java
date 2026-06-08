@@ -11,14 +11,24 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     private List<NotificationModel> notifications;
+    private OnNotificationListener listener;
 
-    public NotificationAdapter(List<NotificationModel> notifications) {
+    public interface OnNotificationListener {
+        void onDeleteClick(int position);
+    }
+
+    public NotificationAdapter(List<NotificationModel> notifications, OnNotificationListener listener) {
         this.notifications = notifications;
+        this.listener = listener;
     }
 
     public void setNotifications(List<NotificationModel> notifications) {
         this.notifications = notifications;
         notifyDataSetChanged();
+    }
+
+    public List<NotificationModel> getNotifications() {
+        return notifications;
     }
 
     @NonNull
@@ -43,6 +53,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 holder.ivIcon.setImageResource(R.drawable.ic_rainy);
                 holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
                 break;
+            case "sun":
+                holder.ivIcon.setImageResource(R.drawable.ic_wb_sunny);
+                holder.ivIcon.setBackgroundResource(R.drawable.circle_yellow_light);
+                break;
+            case "dry":
+                holder.ivIcon.setImageResource(R.drawable.ic_hanger);
+                holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
+                break;
             case "in":
                 holder.ivIcon.setImageResource(R.drawable.ic_arrow_back);
                 holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
@@ -56,6 +74,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 holder.ivIcon.setBackgroundResource(R.drawable.circle_blue_light);
                 break;
         }
+
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(holder.getAdapterPosition());
+            }
+        });
     }
 
     @Override
@@ -64,12 +88,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivIcon;
+        ImageView ivIcon, btnDelete;
         TextView tvTitle, tvMessage, tvTime;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivIcon = itemView.findViewById(R.id.ivIcon);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvMessage = itemView.findViewById(R.id.tvMessage);
             tvTime = itemView.findViewById(R.id.tvTime);

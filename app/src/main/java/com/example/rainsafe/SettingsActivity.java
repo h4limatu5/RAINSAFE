@@ -145,6 +145,14 @@ public class SettingsActivity extends AppCompatActivity {
         swAutoMode.setOnCheckedChangeListener((v, isChecked) -> {
             saveSetting("auto_mode", isChecked);
             updateAutoIconState(isChecked);
+            // Request permission if auto mode is enabled (example for location-based auto mode)
+            if (isChecked) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) 
+                        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    androidx.core.app.ActivityCompat.requestPermissions(this, 
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
+                }
+            }
         });
         swNightMode.setOnCheckedChangeListener((v, isChecked) -> saveSetting("night_mode", isChecked));
         swRainSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("rain_sensor", isChecked));
@@ -182,7 +190,16 @@ public class SettingsActivity extends AppCompatActivity {
 
         rlRainSensitivity.setOnClickListener(v -> Toast.makeText(this, "Pengaturan Sensitivitas", Toast.LENGTH_SHORT).show());
         rlResponseDelay.setOnClickListener(v -> Toast.makeText(this, "Pengaturan Delay", Toast.LENGTH_SHORT).show());
-        rlCalibration.setOnClickListener(v -> Toast.makeText(this, "Memulai Kalibrasi...", Toast.LENGTH_SHORT).show());
+        rlCalibration.setOnClickListener(v -> {
+            Toast.makeText(this, "Meminta izin kamera untuk kalibrasi visual...", Toast.LENGTH_SHORT).show();
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) 
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this, 
+                    new String[]{android.Manifest.permission.CAMERA}, 1002);
+            } else {
+                Toast.makeText(this, "Memulai Kalibrasi...", Toast.LENGTH_SHORT).show();
+            }
+        });
         rlLanguage.setOnClickListener(v -> showLanguageDialog());
     }
 

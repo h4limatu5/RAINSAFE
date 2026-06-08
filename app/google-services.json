@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "592905107903",
+    "firebase_url": "https://rainsafe-777f2-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "rainsafe-777f2",
+    "storage_bucket": "rainsafe-777f2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592905107903:android:0668c8b9bb246f5af4490a",
+        "android_client_info": {
+          "package_name": "com.example.rainsafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "592905107903-1hcq0ufaud9esaa794r6uo6dtktggdah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuYyF_D5nx6fqo3-NeHs-HjDVXJcR4poM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "592905107903-1hcq0ufaud9esaa794r6uo6dtktggdah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
