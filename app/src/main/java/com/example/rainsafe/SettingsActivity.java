@@ -181,6 +181,13 @@ public class SettingsActivity extends AppCompatActivity {
         rlChangePassword.setOnClickListener(v -> Toast.makeText(this, "Fitur Ganti Password akan segera hadir", Toast.LENGTH_SHORT).show());
         
         rlLogoutAll.setOnClickListener(v -> {
+            // Clear login session
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove("is_logged_in");
+            editor.remove("user_id");
+            editor.remove("login_type");
+            editor.apply();
+
             Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

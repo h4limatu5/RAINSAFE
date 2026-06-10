@@ -53,8 +53,23 @@ public class RegisterActivity extends AppCompatActivity {
                         // Insert user to database
                         boolean isInserted = dbHelper.insertUser(fullName, email, phone, password);
                         if (isInserted) {
-                            Toast.makeText(RegisterActivity.this, "Pendaftaran Berhasil! Silakan Login", Toast.LENGTH_LONG).show();
-                            finish(); // Go back to Login screen
+                            Toast.makeText(RegisterActivity.this, "Pendaftaran Berhasil! Selamat datang, " + fullName, Toast.LENGTH_LONG).show();
+                            
+                            // Auto-login: Save session to SharedPreferences
+                            android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+                            android.content.SharedPreferences.Editor editor = prefs.edit();
+                            editor.putBoolean("is_logged_in", true);
+                            editor.putString("user_id", email);
+                            editor.putString("login_type", "email");
+                            editor.apply();
+
+                            // Navigate to Dashboard directly
+                            Intent intent = new Intent(RegisterActivity.this, DashboardActivity.class);
+                            intent.putExtra("USER_IDENTIFIER", email);
+                            intent.putExtra("LOGIN_TYPE", "email");
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
                         } else {
                             Toast.makeText(RegisterActivity.this, "Pendaftaran Gagal. Coba lagi.", Toast.LENGTH_SHORT).show();
                         }

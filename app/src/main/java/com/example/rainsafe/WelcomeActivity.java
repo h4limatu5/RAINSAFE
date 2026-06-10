@@ -23,6 +23,19 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check login session
+        android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+        boolean isLoggedIn = prefs.getBoolean("is_logged_in", false);
+        if (isLoggedIn) {
+            Intent intent = new Intent(WelcomeActivity.this, DashboardActivity.class);
+            intent.putExtra("USER_IDENTIFIER", prefs.getString("user_id", ""));
+            intent.putExtra("LOGIN_TYPE", prefs.getString("login_type", ""));
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_welcome);
 
         ivFeatureIcon = findViewById(R.id.ivFeatureIcon);

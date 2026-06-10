@@ -75,6 +75,18 @@ public class FirebaseSyncHelper {
         }
     }
 
+    public void updateLaundryControl(int position) {
+        mDatabase.child("controls").child("laundry_pos").setValue(position)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Laundry position updated to " + position))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to update laundry position", e));
+    }
+
+    public void updateAutoMode(boolean isActive) {
+        mDatabase.child("controls").child("auto_mode").setValue(isActive ? 1 : 0)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Auto mode updated to " + isActive))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to update auto mode", e));
+    }
+
     /**
      * Push log spesifik ke Firebase
      */

@@ -30,6 +30,7 @@ public class DashboardActivity extends AppCompatActivity {
     private View notificationDot;
     private ImageView ivAutoIcon;
     private CardView cvAutoIcon;
+    private androidx.appcompat.widget.SwitchCompat swAutoMode;
     private boolean isRaining = false;
     private boolean isDryNotified = false;
     private boolean isLaundryOut = true; // Initial state based on XML
@@ -76,6 +77,7 @@ public class DashboardActivity extends AppCompatActivity {
         notificationDot = findViewById(R.id.notificationDot);
         ivAutoIcon = findViewById(R.id.ivAutoIcon);
         cvAutoIcon = findViewById(R.id.cvAutoIcon);
+        swAutoMode = findViewById(R.id.swAutoMode);
 
         findViewById(R.id.btnRefresh).setOnClickListener(v -> updateSensorUI());
 
@@ -83,6 +85,7 @@ public class DashboardActivity extends AppCompatActivity {
             isLaundryOut = false;
             android.widget.Toast.makeText(this, "Jemuran dimasukkan", android.widget.Toast.LENGTH_SHORT).show();
             dbHelper.addLog("Manual", "Jemuran dimasukkan secara manual", "user", "action");
+            firebaseHelper.updateLaundryControl(0);
         });
 
         findViewById(R.id.btnPullOut).setOnClickListener(v -> {
@@ -92,6 +95,15 @@ public class DashboardActivity extends AppCompatActivity {
             isLaundryOut = true;
             android.widget.Toast.makeText(this, "Jemuran dikeluarkan", android.widget.Toast.LENGTH_SHORT).show();
             dbHelper.addLog("Manual", "Jemuran dikeluarkan secara manual", "user", "action");
+            firebaseHelper.updateLaundryControl(1);
+        });
+
+        swAutoMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            android.content.SharedPreferences.Editor editor = getSharedPreferences("RainSafePrefs", MODE_PRIVATE).edit();
+            editor.putBoolean("auto_mode", isChecked);
+            editor.apply();
+            firebaseHelper.updateAutoMode(isChecked);
+            updateSensorUI();
         });
 
         findViewById(R.id.btnMenu).setOnClickListener(v -> {
@@ -207,6 +219,11 @@ public class DashboardActivity extends AppCompatActivity {
         // Update Auto Mode Icon and Background based on Settings
         android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
         boolean isAutoMode = prefs.getBoolean("auto_mode", true);
+        
+        if (swAutoMode != null && swAutoMode.isChecked() != isAutoMode) {
+            swAutoMode.setChecked(isAutoMode);
+        }
+
         if (ivAutoIcon != null && cvAutoIcon != null) {
             if (isAutoMode) {
                 cvAutoIcon.setCardBackgroundColor(ContextCompat.getColor(this, R.color.button_blue));
