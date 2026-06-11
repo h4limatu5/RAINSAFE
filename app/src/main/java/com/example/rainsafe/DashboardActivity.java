@@ -428,6 +428,11 @@ public class DashboardActivity extends AppCompatActivity {
         // Update Auto Mode Icon, Background, dan teks status
         android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
         boolean isAutoMode = prefs.getBoolean("auto_mode", true);
+        
+        if (swAutoMode != null && swAutoMode.isChecked() != isAutoMode) {
+            swAutoMode.setChecked(isAutoMode);
+        }
+
         if (ivAutoIcon != null && cvAutoIcon != null) {
             if (isAutoMode) {
                 cvAutoIcon.setCardBackgroundColor(ContextCompat.getColor(this, R.color.button_blue));

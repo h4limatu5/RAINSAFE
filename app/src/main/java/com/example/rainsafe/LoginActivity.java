@@ -168,14 +168,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void navigateToDashboard() {
+        String identifier = isEmailLogin ? etEmail.getText().toString().trim() : etPhone.getText().toString().trim();
+        String loginType = isEmailLogin ? "email" : "phone";
+
+        // Save session to SharedPreferences
+        android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("is_logged_in", true);
+        editor.putString("user_id", identifier);
+        editor.putString("login_type", loginType);
+        editor.apply();
+
         Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-        if (isEmailLogin) {
-            intent.putExtra("USER_IDENTIFIER", etEmail.getText().toString().trim());
-            intent.putExtra("LOGIN_TYPE", "email");
-        } else {
-            intent.putExtra("USER_IDENTIFIER", etPhone.getText().toString().trim());
-            intent.putExtra("LOGIN_TYPE", "phone");
-        }
+        intent.putExtra("USER_IDENTIFIER", identifier);
+        intent.putExtra("LOGIN_TYPE", loginType);
         startActivity(intent);
         finish();
     }

@@ -96,6 +96,12 @@ public class FirebaseSyncHelper {
         }
     }
 
+    public void updateLaundryControl(int position) {
+        mDatabase.child("controls").child("laundry_pos").setValue(position)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Laundry position updated to " + position))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to update laundry position", e));
+    }
+
     public void pushSingleLog(Map<String, String> log) {
         String logId = log.get("id");
         if (logId == null) {
@@ -187,10 +193,14 @@ public class FirebaseSyncHelper {
      */
     public void updateLaundryStatus(String status, WriteCallback callback) {
         Log.d(TAG, "Writing laundry_status = " + status);
-        mDatabase.child("control").child("laundry_status").setValue(status)
+        // Write to '/control/laundry_status' for original ESP32
+        mDatabase.child("control").child("laundry_status").setValue(status);
+        // Write to '/controls/laundry_pos' for new remote code compatibility
+        mDatabase.child("controls").child("laundry_pos").setValue("in".equals(status) ? 0 : 1);
+        
+        mDatabase.child("control").child("last_command_by").setValue("manual_app")
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "laundry_status updated to: " + status);
-                    mDatabase.child("control").child("last_command_by").setValue("manual_app");
                     if (callback != null) callback.onSuccess();
                 })
                 .addOnFailureListener(e -> {
@@ -213,10 +223,14 @@ public class FirebaseSyncHelper {
      */
     public void updateAutoMode(boolean autoMode, WriteCallback callback) {
         Log.d(TAG, "Writing auto_mode = " + autoMode);
-        mDatabase.child("control").child("auto_mode").setValue(autoMode)
+        // Write to '/control/auto_mode' for original ESP32
+        mDatabase.child("control").child("auto_mode").setValue(autoMode);
+        // Write to '/controls/auto_mode' for new remote code compatibility
+        mDatabase.child("controls").child("auto_mode").setValue(autoMode ? 1 : 0);
+
+        mDatabase.child("control").child("last_command_by").setValue("manual_app")
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "auto_mode updated to: " + autoMode);
-                    mDatabase.child("control").child("last_command_by").setValue("manual_app");
                     if (callback != null) callback.onSuccess();
                 })
                 .addOnFailureListener(e -> {
