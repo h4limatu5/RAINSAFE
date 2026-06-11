@@ -13,8 +13,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -30,10 +41,28 @@ public class DashboardActivity extends AppCompatActivity {
     private View notificationDot;
     private ImageView ivAutoIcon;
     private CardView cvAutoIcon;
+    private CardView btnLaundryAction;
+    private ImageView ivLaundryActionIcon;
+    private TextView tvLaundryActionLabel;
+    private TextView tvAutoStatus;           // Teks "Aktif / Non-aktif" di card otomatisasi
+    private TextView tvLaundryPositionBadge; // Badge Di Luar / Di Dalam
+    private TextView tvLaundryStartTime;    // Waktu mulai jemuran dikeluarkan
+    private TextView tvLaundryInsideMsg;    // Pesan jemuran di dalam
+    private androidx.appcompat.widget.SwitchCompat swAutoMode;
+    private boolean isAutoModeSwitchUpdating = false; // Guard to prevent echo loop
+    private boolean isManualCommand = false;           // Guard: block Firebase echo after manual action
     private boolean isRaining = false;
     private boolean isDryNotified = false;
     private boolean isLaundryOut = true; // Initial state based on XML
     private long laundryStartTime = System.currentTimeMillis() - (20 * 60 * 1000); // Simulated 20 mins ago
+
+    // Weather (Open-Meteo)
+    private TextView tvBigTemp, tvWeatherDesc;
+    private static final String OPEN_METEO_URL =
+        "https://api.open-meteo.com/v1/forecast?latitude=-3.742650&longitude=114.731153" +
+        "&current=temperature_2m,relative_humidity_2m,rain" +
+        "&hourly=precipitation_probability,rain&timezone=Asia/Jakarta";
+    private ExecutorService weatherExecutor = Executors.newSingleThreadExecutor();
 
     private DatabaseHelper dbHelper;
     private FirebaseSyncHelper firebaseHelper;
@@ -53,12 +82,12 @@ public class DashboardActivity extends AppCompatActivity {
         navHistory = findViewById(R.id.navHistory);
         navSettings = findViewById(R.id.navSettings);
         navProfile = findViewById(R.id.navProfile);
-        
+
         ivHome = findViewById(R.id.ivHome);
         ivHistory = findViewById(R.id.ivHistory);
         ivSettings = findViewById(R.id.ivSettings);
         ivProfile = findViewById(R.id.ivProfile);
-        
+
         tvHome = findViewById(R.id.tvHome);
         tvHistory = findViewById(R.id.tvHistory);
         tvSettings = findViewById(R.id.tvSettings);
@@ -70,29 +99,76 @@ public class DashboardActivity extends AppCompatActivity {
         tvStatsTotalDuration = findViewById(R.id.tvStatsTotalDuration);
         tvSensorRainStatus = findViewById(R.id.tvSensorRainStatus);
         tvSensorLightStatus = findViewById(R.id.tvSensorLightStatus);
-        tvDrynessPercent = findViewById(R.id.tv_val_dry_percent); // Make sure these IDs match activity_dashboard.xml
+        tvDrynessPercent = findViewById(R.id.tv_val_dry_percent);
         tvDrynessEst = findViewById(R.id.tv_val_dry_est);
         pbDryness = findViewById(R.id.pb_dryness);
         notificationDot = findViewById(R.id.notificationDot);
         ivAutoIcon = findViewById(R.id.ivAutoIcon);
         cvAutoIcon = findViewById(R.id.cvAutoIcon);
+        swAutoMode = findViewById(R.id.swAutoMode);
+        tvAutoStatus = findViewById(R.id.tvAutoStatus);
+        btnLaundryAction = findViewById(R.id.btnLaundryAction);
+        ivLaundryActionIcon = findViewById(R.id.ivLaundryActionIcon);
+        tvLaundryActionLabel = findViewById(R.id.tvLaundryActionLabel);
+        tvLaundryPositionBadge = findViewById(R.id.tvLaundryPositionBadge);
+        tvLaundryStartTime = findViewById(R.id.tvLaundryStartTime);
+        tvLaundryInsideMsg = findViewById(R.id.tvLaundryInsideMsg);
 
-        findViewById(R.id.btnRefresh).setOnClickListener(v -> updateSensorUI());
+        // Weather Views
+        tvBigTemp = findViewById(R.id.tvBigTemp);
+        tvWeatherDesc = findViewById(R.id.tvWeatherDesc);
 
-        findViewById(R.id.btnPullIn).setOnClickListener(v -> {
-            isLaundryOut = false;
-            android.widget.Toast.makeText(this, "Jemuran dimasukkan", android.widget.Toast.LENGTH_SHORT).show();
-            dbHelper.addLog("Manual", "Jemuran dimasukkan secara manual", "user", "action");
+        findViewById(R.id.btnRefresh).setOnClickListener(v -> {
+            updateSensorUI();
+            fetchWeather(); // Refresh cuaca
         });
 
-        findViewById(R.id.btnPullOut).setOnClickListener(v -> {
-            if (!isLaundryOut) {
+        // Wire up the Auto Mode toggle in the automation card
+        if (swAutoMode != null) {
+            swAutoMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isAutoModeSwitchUpdating) return;
+                // Guard: block Firebase echo untuk 2 detik
+                isManualCommand = true;
+                handler.postDelayed(() -> isManualCommand = false, 2000);
+                getSharedPreferences("RainSafePrefs", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("auto_mode", isChecked)
+                        .apply();
+                firebaseHelper.updateAutoMode(isChecked);
+                updateSensorUI();
+                android.widget.Toast.makeText(this,
+                        isChecked ? "Mode Otomatis Aktif" : "Mode Manual Aktif",
+                        android.widget.Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        btnLaundryAction.setOnClickListener(v -> {
+            // Guard: block Firebase echo untuk 2 detik
+            isManualCommand = true;
+            handler.postDelayed(() -> isManualCommand = false, 2000);
+
+            if (isLaundryOut) {
+                // Jemuran di luar → Masukan
+                isLaundryOut = false;
+                android.widget.Toast.makeText(this, "Jemuran dimasukkan", android.widget.Toast.LENGTH_SHORT).show();
+                dbHelper.addLog("Manual", "Jemuran dimasukkan secara manual", "user", "action");
+                firebaseHelper.updateLaundryStatus("in");
+            } else {
+                // Jemuran di dalam → Keluarkan
                 laundryStartTime = System.currentTimeMillis();
+                isLaundryOut = true;
+                android.widget.Toast.makeText(this, "Jemuran dikeluarkan", android.widget.Toast.LENGTH_SHORT).show();
+                dbHelper.addLog("Manual", "Jemuran dikeluarkan secara manual", "user", "action");
+                firebaseHelper.updateLaundryStatus("out");
             }
-            isLaundryOut = true;
-            android.widget.Toast.makeText(this, "Jemuran dikeluarkan", android.widget.Toast.LENGTH_SHORT).show();
-            dbHelper.addLog("Manual", "Jemuran dikeluarkan secara manual", "user", "action");
+            updateLaundryButton();
+            updateLaundryStatusSection();
+            firebaseHelper.syncLogs();
         });
+
+        // Inisialisasi tampilan button & status section
+        updateLaundryButton();
+        updateLaundryStatusSection();
 
         findViewById(R.id.btnMenu).setOnClickListener(v -> {
             Intent intent = new Intent(this, MenuActivity.class);
@@ -120,12 +196,11 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Set Default Position (Home - 0)
         updateNavUI(0);
 
         // Navigation Listeners
         navHome.setOnClickListener(v -> updateNavUI(0));
-        
+
         navHistory.setOnClickListener(v -> {
             Intent intent = new Intent(this, HistoryActivity.class);
             intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
@@ -144,7 +219,6 @@ public class DashboardActivity extends AppCompatActivity {
             finish();
         });
 
-        // Handle user navigation with profile data
         navProfile.setOnClickListener(v -> {
             Intent intent = new Intent(this, ProfileActivity.class);
             intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
@@ -154,10 +228,12 @@ public class DashboardActivity extends AppCompatActivity {
             finish();
         });
 
-        // Setup Real-time Updates
         setupRealTimeUpdates();
 
-        // Start Media Playback Service for Control Center integration
+        // Ambil data cuaca saat pertama kali buka
+        fetchWeather();
+
+        // Start Media Playback Service
         Intent mediaIntent = new Intent(this, MediaPlaybackService.class);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             startForegroundService(mediaIntent);
@@ -166,45 +242,190 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
+    // ─── OPEN-METEO WEATHER ──────────────────────────────────────────────────
+
+    /**
+     * Fetch cuaca dari Open-Meteo API secara background thread,
+     * lalu update UI di main thread.
+     */
+    private void fetchWeather() {
+        weatherExecutor.execute(() -> {
+            try {
+                URL url = new URL(OPEN_METEO_URL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) sb.append(line);
+                    reader.close();
+
+                    JSONObject root = new JSONObject(sb.toString());
+                    JSONObject current = root.getJSONObject("current");
+
+                    double temp = current.getDouble("temperature_2m");
+                    double humidity = current.getDouble("relative_humidity_2m");
+                    double rain = current.getDouble("rain");
+
+                    // Ambil peluang hujan jam pertama dari hourly
+                    int precipProb = 0;
+                    JSONObject hourly = root.getJSONObject("hourly");
+                    if (hourly.has("precipitation_probability")) {
+                        precipProb = hourly.getJSONArray("precipitation_probability").getInt(0);
+                    }
+
+                    final double finalTemp = temp;
+                    final double finalRain = rain;
+                    final int finalPrecipProb = precipProb;
+
+                    handler.post(() -> updateWeatherUI(finalTemp, finalRain, finalPrecipProb));
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                android.util.Log.e("RainSafe_Weather", "Gagal fetch cuaca: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Perbarui tampilan cuaca di UI berdasarkan data Open-Meteo.
+     */
+    private void updateWeatherUI(double temp, double rainMm, int precipProb) {
+        if (tvBigTemp != null) {
+            tvBigTemp.setText(String.format(Locale.getDefault(), "%.0f °C", temp));
+        }
+        if (tvWeatherDesc != null) {
+            String desc;
+            if (rainMm > 0) {
+                desc = "Sedang Hujan";
+                isRaining = true;
+            } else if (precipProb >= 70) {
+                desc = "Berpotensi Hujan";
+            } else if (precipProb >= 40) {
+                desc = "Agak Mendung";
+            } else {
+                desc = "Cerah Berawan";
+                isRaining = false;
+            }
+            tvWeatherDesc.setText(desc);
+        }
+        // Update rain prob di mini card
+        if (tvRainProbVal != null) {
+            tvRainProbVal.setText(precipProb + "%");
+        }
+    }
+
+    // ─── REAL-TIME SETUP ─────────────────────────────────────────────────────
+
     private void setupRealTimeUpdates() {
+        firebaseHelper.startListeningSensors((name, value, status, unit) -> {
+            runOnUiThread(this::updateSensorUI);
+        });
+
+        firebaseHelper.startListeningControl((autoMode, laundryStatusVal) -> {
+            runOnUiThread(() -> {
+                // Abaikan echo balik jika baru saja ada perintah manual
+                if (isManualCommand) return;
+
+                getSharedPreferences("RainSafePrefs", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("auto_mode", autoMode)
+                        .apply();
+
+                if (swAutoMode != null && swAutoMode.isChecked() != autoMode) {
+                    isAutoModeSwitchUpdating = true;
+                    swAutoMode.setChecked(autoMode);
+                    isAutoModeSwitchUpdating = false;
+                }
+
+                boolean newLaundryOut = "out".equalsIgnoreCase(laundryStatusVal);
+                if (newLaundryOut != isLaundryOut) {
+                    if (newLaundryOut) laundryStartTime = System.currentTimeMillis();
+                    isLaundryOut = newLaundryOut;
+                    updateLaundryButton();
+                    updateLaundryStatusSection();
+                }
+                updateSensorUI();
+            });
+        });
+
+        // Refresh UI + cuaca setiap 30 detik
         updateRunnable = new Runnable() {
+            private int tickCount = 0;
             @Override
             public void run() {
-                simulateSensorChanges();
                 updateSensorUI();
-                // Schedule next update in 3 seconds
+                tickCount++;
+                // Fetch cuaca setiap 10 tick (30s * 10 = 5 menit)
+                if (tickCount % 10 == 0) fetchWeather();
                 handler.postDelayed(this, 3000);
             }
         };
         handler.post(updateRunnable);
     }
-    private void simulateSensorChanges() {
-        Random random = new Random();
-        
-        // Simulate Rain Sensor (0-100%)
-        int rainVal = random.nextInt(100);
-        String rainStatus = rainVal > 50 ? "Hujan" : "Aman";
-        dbHelper.updateSensorData("Sensor Hujan", String.valueOf(rainVal), rainStatus);
-        
-        // Simulate Light Sensor (0-2000 lux)
-        int lightVal = random.nextInt(2000);
-        String lightStatus = lightVal > 1000 ? "Terik" : (lightVal > 300 ? "Cerah" : "Mendung");
-        dbHelper.updateSensorData("Sensor Cahaya", String.valueOf(lightVal), lightStatus);
 
-        // Update Dashboard Main Temperature/Weather (Optional Simulation)
-        TextView tvTemp = findViewById(R.id.tvBigTemp);
-        TextView tvWeatherDesc = findViewById(R.id.tvWeatherDesc);
-        if (tvTemp != null) {
-            int temp = 25 + random.nextInt(10);
-            tvTemp.setText(temp + " °C");
-        }
-        if (tvWeatherDesc != null) {
-            tvWeatherDesc.setText(rainStatus.equals("Hujan") ? "Hujan Berawan" : "Cerah Berawan");
+    // ─── LAUNDRY BUTTON ──────────────────────────────────────────────────────
+
+    /**
+     * Update tampilan button aksi jemuran berdasarkan kondisi isLaundryOut.
+     */
+    private void updateLaundryButton() {
+        if (btnLaundryAction == null) return;
+        if (isLaundryOut) {
+            btnLaundryAction.setCardBackgroundColor(ContextCompat.getColor(this, R.color.button_blue));
+            tvLaundryActionLabel.setText("Masukan Jemuran");
+            ivLaundryActionIcon.setImageResource(R.drawable.ic_hanger);
+            ivLaundryActionIcon.setColorFilter(ContextCompat.getColor(this, R.color.white));
+        } else {
+            btnLaundryAction.setCardBackgroundColor(ContextCompat.getColor(this, R.color.button_orange));
+            tvLaundryActionLabel.setText("Keluarkan Jemuran");
+            ivLaundryActionIcon.setImageResource(R.drawable.ic_arrow_upward);
+            ivLaundryActionIcon.setColorFilter(ContextCompat.getColor(this, R.color.white));
         }
     }
 
+    // ─── LAUNDRY STATUS SECTION ───────────────────────────────────────────────
+
+    /**
+     * Update bagian status jemuran di dashboard:
+     * - Jemuran di luar: badge "Di Luar" + waktu mulai dikeluarkan
+     * - Jemuran di dalam: badge "Di Dalam" + pesan "Jemuran sedang di dalam"
+     */
+    private void updateLaundryStatusSection() {
+        if (tvLaundryPositionBadge == null) return;
+        if (isLaundryOut) {
+            // Badge hijau "Di Luar"
+            tvLaundryPositionBadge.setText("Di Luar");
+            tvLaundryPositionBadge.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
+
+            // Tampilkan waktu mulai, sembunyikan pesan di dalam
+            if (tvLaundryStartTime != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd MMM yyyy", new Locale("id", "ID"));
+                String startStr = "Mulai dijemur: " + sdf.format(new Date(laundryStartTime));
+                tvLaundryStartTime.setText(startStr);
+                tvLaundryStartTime.setVisibility(View.VISIBLE);
+            }
+            if (tvLaundryInsideMsg != null) tvLaundryInsideMsg.setVisibility(View.GONE);
+        } else {
+            // Badge abu-abu "Di Dalam"
+            tvLaundryPositionBadge.setText("Di Dalam");
+            tvLaundryPositionBadge.setTextColor(ContextCompat.getColor(this, R.color.text_grey));
+
+            // Sembunyikan waktu mulai, tampilkan pesan di dalam
+            if (tvLaundryStartTime != null) tvLaundryStartTime.setVisibility(View.GONE);
+            if (tvLaundryInsideMsg != null) tvLaundryInsideMsg.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // ─── SENSOR UI ───────────────────────────────────────────────────────────
+
     private void updateSensorUI() {
-        // Update Auto Mode Icon and Background based on Settings
+        // Update Auto Mode Icon, Background, dan teks status
         android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
         boolean isAutoMode = prefs.getBoolean("auto_mode", true);
         if (ivAutoIcon != null && cvAutoIcon != null) {
@@ -216,16 +437,26 @@ public class DashboardActivity extends AppCompatActivity {
                 ivAutoIcon.setColorFilter(ContextCompat.getColor(this, R.color.text_grey));
             }
         }
+        // Update teks "Aktif / Non-aktif"
+        if (tvAutoStatus != null) {
+            if (isAutoMode) {
+                tvAutoStatus.setText("Aktif");
+                tvAutoStatus.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
+            } else {
+                tvAutoStatus.setText("Non-aktif");
+                tvAutoStatus.setTextColor(ContextCompat.getColor(this, R.color.text_grey));
+            }
+        }
 
-        // Update Duration
+        // Update Duration (hanya saat jemuran di luar)
         if (isLaundryOut) {
             long elapsedMillis = System.currentTimeMillis() - laundryStartTime;
             long minutes = (elapsedMillis / (1000 * 60)) % 60;
             long hours = (elapsedMillis / (1000 * 60 * 60));
             tvCurrentDuration.setText(hours + " jam " + minutes + " menit");
-            
-            // Update total stats (simulated addition)
             tvStatsTotalDuration.setText((6 + hours) + " jam " + (10 + minutes) + " menit");
+        } else {
+            tvCurrentDuration.setText("—");
         }
 
         // Fetch from Database
@@ -233,17 +464,15 @@ public class DashboardActivity extends AppCompatActivity {
         Map<String, String> lightData = dbHelper.getLatestSensorData("Sensor Cahaya");
 
         if (!rainData.isEmpty()) {
-            tvRainProbVal.setText(rainData.get("value") + rainData.get("unit"));
+            tvSensorRainStatus.setText(rainData.get("status"));
             String currentStatus = rainData.get("status");
-            tvSensorRainStatus.setText(currentStatus);
-            
-            // Real-time Notification logic
+
             if (currentStatus.equalsIgnoreCase("Hujan") && !isRaining) {
                 isRaining = true;
                 dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran ditarik otomatis.", "system", "rain");
                 showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran ditarik otomatis.");
                 notificationDot.setVisibility(View.VISIBLE);
-                sendEmailNotification("RainSafe: Peringatan Hujan!", 
+                sendEmailNotification("RainSafe: Peringatan Hujan!",
                     "Halo, sistem RainSafe mendeteksi hujan. Jemuran Anda telah ditarik secara otomatis untuk keamanan.");
             } else if (currentStatus.equalsIgnoreCase("Aman") || currentStatus.equalsIgnoreCase("Cerah")) {
                 isRaining = false;
@@ -254,20 +483,15 @@ public class DashboardActivity extends AppCompatActivity {
             tvSensorLightStatus.setText(lightData.get("status"));
         }
 
-        // Logic to calculate Dryness Percentage based on Light
+        // Dryness Calculation
         try {
             int lightVal = 0;
-            if (!lightData.isEmpty()) {
-                lightVal = Integer.parseInt(lightData.get("value"));
-            }
-            
-            // Simple heuristic: Base dryness increases with light (since temp sensor removed)
-            // Using a fixed assumed temp or just light
-            double dryingPower = 15.0 + (lightVal * 0.04); // Adjusted formula
-            
+            if (!lightData.isEmpty()) lightVal = Integer.parseInt(lightData.get("value"));
+            double dryingPower = 15.0 + (lightVal * 0.04);
+
             if (isLaundryOut && !isRaining) {
                 long elapsedMinutes = (System.currentTimeMillis() - laundryStartTime) / (1000 * 60);
-                int dryness = (int) (elapsedMinutes * (dryingPower / 50.0)); 
+                int dryness = (int) (elapsedMinutes * (dryingPower / 50.0));
                 if (dryness >= 100) {
                     dryness = 100;
                     if (!isDryNotified) {
@@ -278,28 +502,25 @@ public class DashboardActivity extends AppCompatActivity {
                 } else {
                     isDryNotified = false;
                 }
-                
                 if (tvDrynessPercent != null) tvDrynessPercent.setText(dryness + "%");
                 if (pbDryness != null) pbDryness.setProgress(dryness);
-                
-                // Estimate remaining time
+
                 if (dryness < 100) {
                     int remaining = 100 - dryness;
-                    double ratePerMin = dryingPower / 50.0;
-                    int estMins = (int) (remaining / ratePerMin);
-                    if (tvDrynessEst != null) tvDrynessEst.setText(estMins + " mins remaining");
+                    int estMins = (int) (remaining / (dryingPower / 50.0));
+                    if (tvDrynessEst != null) tvDrynessEst.setText(estMins + " menit lagi");
                 } else {
-                    if (tvDrynessEst != null) tvDrynessEst.setText("Fully Dry");
+                    if (tvDrynessEst != null) tvDrynessEst.setText("Sudah Kering");
                 }
             }
         } catch (Exception e) {
             // Ignore parse errors
         }
 
-        // Sync to Firebase
-        firebaseHelper.syncSensors();
         firebaseHelper.syncLogs();
     }
+
+    // ─── UTILITIES ───────────────────────────────────────────────────────────
 
     private void sendEmailNotification(String title, String message) {
         String identifier = getIntent().getStringExtra("USER_IDENTIFIER");
@@ -309,7 +530,6 @@ public class DashboardActivity extends AppCompatActivity {
         if ("email".equals(loginType)) {
             targetEmail = identifier;
         } else if (identifier != null) {
-            // Jika login via HP, ambil email dari database
             Map<String, String> userData = dbHelper.getUserDataByPhone(identifier);
             if (userData != null && userData.containsKey("email")) {
                 targetEmail = userData.get("email");
@@ -318,16 +538,13 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (targetEmail != null && !targetEmail.isEmpty()) {
             android.util.Log.d("RainSafe_Email", "Mengirim email ke: " + targetEmail);
-            // Toast sebagai indikasi email terkirim melalui background service simulasi
             android.widget.Toast.makeText(this, "Email dikirim ke: " + targetEmail, android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
     private void showNotificationAlert(String title, String message) {
-        // Show Red Dot in UI
         notificationDot.setVisibility(View.VISIBLE);
 
-        // Check for Notification Permission (Android 13+)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
                     != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -337,13 +554,11 @@ public class DashboardActivity extends AppCompatActivity {
             }
         }
 
-        // Create Intent to open NotificationsActivity when clicked
         android.content.Intent intent = new android.content.Intent(this, NotificationsActivity.class);
         intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
         android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
                 this, 0, intent, android.app.PendingIntent.FLAG_IMMUTABLE);
 
-        // Android System Notification
         androidx.core.app.NotificationCompat.Builder builder = new androidx.core.app.NotificationCompat.Builder(this, "RAINSAFE_NOTIF")
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(title)
@@ -353,13 +568,12 @@ public class DashboardActivity extends AppCompatActivity {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-        android.app.NotificationManager notificationManager = (android.app.NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        android.app.NotificationManager notificationManager =
+                (android.app.NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 
-        // Create channel for Android O+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             android.app.NotificationChannel channel = new android.app.NotificationChannel(
-                    "RAINSAFE_NOTIF",
-                    "RainSafe Alerts",
+                    "RAINSAFE_NOTIF", "RainSafe Alerts",
                     android.app.NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Notifications for rain and sensor alerts");
             channel.enableLights(true);
@@ -369,38 +583,52 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
-
-        // Toast for immediate feedback
         android.widget.Toast.makeText(this, title + "\n" + message, android.widget.Toast.LENGTH_LONG).show();
+    }
+
+    private void setAutoMode(boolean enabled) {
+        // Guard: block Firebase echo untuk 2 detik
+        isManualCommand = true;
+        handler.postDelayed(() -> isManualCommand = false, 2000);
+        getSharedPreferences("RainSafePrefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean("auto_mode", enabled)
+                .apply();
+        firebaseHelper.updateAutoMode(enabled);
+        if (swAutoMode != null && swAutoMode.isChecked() != enabled) {
+            isAutoModeSwitchUpdating = true;
+            swAutoMode.setChecked(enabled);
+            isAutoModeSwitchUpdating = false;
+        }
+        updateSensorUI();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateRunnable);
+        weatherExecutor.shutdown();
     }
 
     private void updateNavUI(int position) {
         int grey = ContextCompat.getColor(this, R.color.text_grey);
         int blue = ContextCompat.getColor(this, R.color.button_blue);
 
-        // Reset all to grey/normal
         ivHome.setColorFilter(grey);
         ivHistory.setColorFilter(grey);
         ivSettings.setColorFilter(grey);
         ivProfile.setColorFilter(grey);
-        
+
         tvHome.setTextColor(grey);
         tvHistory.setTextColor(grey);
         tvSettings.setTextColor(grey);
         tvProfile.setTextColor(grey);
-        
+
         tvHome.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvHistory.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvProfile.setTypeface(null, android.graphics.Typeface.NORMAL);
 
-        // Set active item to blue/bold
         switch (position) {
             case 0:
                 ivHome.setColorFilter(blue);
