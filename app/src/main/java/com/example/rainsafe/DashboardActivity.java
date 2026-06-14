@@ -551,8 +551,12 @@ public class DashboardActivity extends BaseActivity {
                 }
             } else if (currentStatus.equalsIgnoreCase("Aman") || currentStatus.equalsIgnoreCase("Cerah")) {
             // Transition from raining to clear
-            if (wasRaining && !isRaining) {
-                // Notify user that weather is safe again
+            if (wasRaining) {
+                // Notify user that weather is safe again and persist a log so it appears in Notifications
+                dbHelper.addLog("Hujan Berhenti", "Hujan sudah reda. Jemuran Anda aman untuk dikeluarkan.", "system", "dry");
+                NotificationHelper.sendNotification(this, 3002,
+                        "Cuaca Aman Kembali",
+                        "Hujan berhenti, Anda dapat mengeluarkan jemuran.");
                 showNotificationAlert("Cuaca Aman Kembali", "Hujan berhenti, Anda dapat mengeluarkan jemuran.");
                 sendEmailNotification("RainSafe: Cuaca Aman Kembali",
                     "Hujan sudah berhenti. Jemuran Anda dapat dikeluarkan secara manual.");

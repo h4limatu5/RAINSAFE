@@ -40,6 +40,8 @@ public class HistoryActivity extends BaseActivity {
 
     private DatabaseHelper dbHelper;
     private String currentFilter = "all";
+    private boolean showAllToday = false;
+    private android.widget.Button btnMoreToday;
 
     // All logs fetched from DB
     private List<Map<String, String>> allLogs = new ArrayList<>();
@@ -106,6 +108,12 @@ public class HistoryActivity extends BaseActivity {
         rvHistory.setLayoutManager(new LinearLayoutManager(this));
         adapter = new HistoryAdapter(new ArrayList<>());
         rvHistory.setAdapter(adapter);
+        btnMoreToday = findViewById(R.id.btnMoreToday);
+        btnMoreToday.setOnClickListener(v -> {
+            showAllToday = true;
+            refreshList();
+            btnMoreToday.setVisibility(View.GONE);
+        });
 
         // Menu Button
         findViewById(R.id.btnMenu).setOnClickListener(v -> {
@@ -283,15 +291,22 @@ public class HistoryActivity extends BaseActivity {
         List<Map<String, String>> yesterday = new ArrayList<>();
         List<Map<String, String>> older     = new ArrayList<>();
 
+        int todayLimit = showAllToday ? filtered.size() : 3;
         for (int i = 0; i < filtered.size(); i++) {
-            if (i < 5)       today.add(filtered.get(i));
-            else if (i < 10) yesterday.add(filtered.get(i));
-            else             older.add(filtered.get(i));
+            if (i < todayLimit)       today.add(filtered.get(i));
+            else if (i < todayLimit + 5) yesterday.add(filtered.get(i));
+            else                         older.add(filtered.get(i));
         }
 
         if (!today.isEmpty()) {
             displayList.add("HARI INI");
             displayList.addAll(today);
+        }
+        // Show 'Lihat Selengkapnya' button when today's list is truncated
+        if (!showAllToday && today.size() > 3 && btnMoreToday != null) {
+            btnMoreToday.setVisibility(View.VISIBLE);
+        } else if (btnMoreToday != null) {
+            btnMoreToday.setVisibility(View.GONE);
         }
         if (!yesterday.isEmpty()) {
             displayList.add("KEMARIN");

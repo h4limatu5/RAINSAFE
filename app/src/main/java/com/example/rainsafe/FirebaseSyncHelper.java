@@ -172,6 +172,7 @@ public class FirebaseSyncHelper {
                                     NotificationHelper.sendNotification(context, 2002,
                                             "Cahaya Kembali Terang",
                                             "Sensor cahaya menunjukkan kondisi terang lagi.");
+                                    dbHelper.addLog("Cahaya Kembali Terang", "Sensor cahaya: " + value + " " + unit, "system", "sun");
                                     prefs.edit().putBoolean("sensor_cahaya_dark", false).apply();
                                 }
                             } catch (Exception e) {
