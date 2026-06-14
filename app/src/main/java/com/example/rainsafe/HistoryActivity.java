@@ -40,8 +40,8 @@ public class HistoryActivity extends BaseActivity {
 
     private DatabaseHelper dbHelper;
     private String currentFilter = "all";
-    private boolean showAllToday = false;
     private android.widget.Button btnMoreToday;
+    private boolean showFullHistory = false;
 
     // All logs fetched from DB
     private List<Map<String, String>> allLogs = new ArrayList<>();
@@ -110,9 +110,9 @@ public class HistoryActivity extends BaseActivity {
         rvHistory.setAdapter(adapter);
         btnMoreToday = findViewById(R.id.btnMoreToday);
         btnMoreToday.setOnClickListener(v -> {
-            showAllToday = true;
+            // Toggle full history view
+            showFullHistory = !showFullHistory;
             refreshList();
-            btnMoreToday.setVisibility(View.GONE);
         });
 
         // Menu Button
@@ -224,10 +224,25 @@ public class HistoryActivity extends BaseActivity {
             Map<String, String> log = allLogs.get(i);
             String icon = log.get("icon");
             String timeStr = log.get("time"); // format "HH:mm"
-            
-            if ("out".equals(icon)) {
+            String title = log.get("title") != null ? log.get("title") : "";
+            String desc = log.get("desc") != null ? log.get("desc") : "";
+
+            // Normalize/guess type: prefer explicit icon, otherwise infer from title/desc
+            String kind = icon != null ? icon.toLowerCase() : "";
+            if (!"in".equals(kind) && !"out".equals(kind) && !"rain".equals(kind)) {
+                String combined = (title + " " + desc).toLowerCase();
+                if (combined.contains("jemuran dikeluarkan") || combined.contains("keluarkan") || combined.contains("dikeluarkan") || combined.contains("keluarkan jemuran")) {
+                    kind = "out";
+                } else if (combined.contains("jemuran masuk") || combined.contains("masuk otomatis") || combined.contains("masuk (manual)") || combined.contains("masuk (manual)") || combined.contains("masuk")) {
+                    kind = "in";
+                } else if (combined.contains("hujan") || combined.contains("peringatan hujan") || combined.contains("hujan terdeteksi")) {
+                    kind = "rain";
+                }
+            }
+
+            if ("out".equals(kind)) {
                 lastOutTime = timeStr;
-            } else if ("in".equals(icon)) {
+            } else if ("in".equals(kind)) {
                 laundryCount++;
                 if (lastOutTime != null && timeStr != null) {
                     try {
@@ -237,7 +252,7 @@ public class HistoryActivity extends BaseActivity {
                         int outM = Integer.parseInt(outParts[1]);
                         int inH = Integer.parseInt(inParts[0]);
                         int inM = Integer.parseInt(inParts[1]);
-                        
+
                         int diffM = (inH * 60 + inM) - (outH * 60 + outM);
                         if (diffM < 0) diffM += 24 * 60; // assumed crossed midnight
                         totalDurationMinutes += diffM;
@@ -246,7 +261,7 @@ public class HistoryActivity extends BaseActivity {
                         // ignore parse errors
                     }
                 }
-            } else if ("rain".equals(icon)) {
+            } else if ("rain".equals(kind)) {
                 rainCount++;
             }
         }
@@ -286,12 +301,32 @@ public class HistoryActivity extends BaseActivity {
         // 2. Build display list with section headers
         List<Object> displayList = new ArrayList<>();
 
+        // If user requested full history, show filtered list without grouping
+        if (showFullHistory) {
+            displayList.addAll(filtered);
+            // Show button as 'Tutup' to allow collapsing back
+            if (btnMoreToday != null) {
+                btnMoreToday.setText("Tutup");
+                btnMoreToday.setVisibility(View.VISIBLE);
+            }
+            // Show/hide empty state
+            if (displayList.isEmpty()) {
+                tvHistoryEmpty.setVisibility(View.VISIBLE);
+                rvHistory.setVisibility(View.GONE);
+            } else {
+                tvHistoryEmpty.setVisibility(View.GONE);
+                rvHistory.setVisibility(View.VISIBLE);
+            }
+            adapter.setData(displayList);
+            return;
+        }
+
         // Buckets
         List<Map<String, String>> today     = new ArrayList<>();
         List<Map<String, String>> yesterday = new ArrayList<>();
         List<Map<String, String>> older     = new ArrayList<>();
 
-        int todayLimit = showAllToday ? filtered.size() : 3;
+        int todayLimit = 3;
         for (int i = 0; i < filtered.size(); i++) {
             if (i < todayLimit)       today.add(filtered.get(i));
             else if (i < todayLimit + 5) yesterday.add(filtered.get(i));
@@ -303,7 +338,8 @@ public class HistoryActivity extends BaseActivity {
             displayList.addAll(today);
         }
         // Show 'Lihat Selengkapnya' button when the filtered list contains more than the default shown today items
-        if (!showAllToday && filtered.size() > 3 && btnMoreToday != null) {
+        if (filtered.size() > 3 && btnMoreToday != null) {
+            btnMoreToday.setText("Lihat Selengkapnya");
             btnMoreToday.setVisibility(View.VISIBLE);
         } else if (btnMoreToday != null) {
             btnMoreToday.setVisibility(View.GONE);
