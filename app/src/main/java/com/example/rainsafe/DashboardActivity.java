@@ -58,7 +58,8 @@ public class DashboardActivity extends AppCompatActivity {
     private androidx.appcompat.widget.SwitchCompat swAutoMode;
     private boolean isAutoModeSwitchUpdating = false; // Guard to prevent echo loop
     private boolean isManualCommand = false;           // Guard: block Firebase echo after manual action
-    private boolean isRaining = false;
+
+    private boolean wasRaining = false; // Track previous rain state
     private boolean isDryNotified = false;
     private boolean isLaundryOut = true; // Initial state based on XML
     private long laundryStartTime = System.currentTimeMillis() - (20 * 60 * 1000); // Simulated 20 mins ago
@@ -442,7 +443,7 @@ public class DashboardActivity extends AppCompatActivity {
     // ─── SENSOR UI ───────────────────────────────────────────────────────────
 
     private void updateSensorUI() {
-        // Update Auto Mode Icon, Background, dan teks status
+
         android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
         boolean isAutoMode = prefs.getBoolean("auto_mode", true);
         
@@ -506,8 +507,16 @@ public class DashboardActivity extends AppCompatActivity {
                         "Halo, sistem RainSafe mendeteksi hujan. Jemuran Anda sedang ditarik secara otomatis untuk keamanan.");
                 }
             } else if (currentStatus.equalsIgnoreCase("Aman") || currentStatus.equalsIgnoreCase("Cerah")) {
-                isRaining = false;
+            // Transition from raining to clear
+            if (wasRaining && !isRaining) {
+                // Notify user that weather is safe again
+                showNotificationAlert("Cuaca Aman Kembali", "Hujan berhenti, Anda dapat mengeluarkan jemuran.");
+                sendEmailNotification("RainSafe: Cuaca Aman Kembali",
+                    "Hujan sudah berhenti. Jemuran Anda dapat dikeluarkan secara manual.");
             }
+            isRaining = false;
+            wasRaining = false;
+        }
         }
 
         int lightVal = 0;
