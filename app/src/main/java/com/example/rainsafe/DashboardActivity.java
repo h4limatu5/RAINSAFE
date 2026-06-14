@@ -60,9 +60,10 @@ public class DashboardActivity extends AppCompatActivity {
     private boolean isManualCommand = false;           // Guard: block Firebase echo after manual action
 
     private boolean wasRaining = false; // Track previous rain state
+    private boolean isRaining = false; // Current rain condition
     private boolean isDryNotified = false;
     private boolean isLaundryOut = true; // Initial state based on XML
-    private long laundryStartTime = System.currentTimeMillis() - (20 * 60 * 1000); // Simulated 20 mins ago
+    private long laundryStartTime = -1; // persisted start time (ms since epoch)
 
     // Weather (Open-Meteo)
     private TextView tvBigTemp, tvWeatherDesc;
@@ -106,6 +107,16 @@ public class DashboardActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
         firebaseHelper = new FirebaseSyncHelper(this);
+
+        // Load persisted laundry state (so returning to home doesn't show simulated 20min)
+        android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+        isLaundryOut = prefs.getBoolean("laundry_out", isLaundryOut);
+        laundryStartTime = prefs.getLong("laundry_start_time", -1);
+        if (isLaundryOut && laundryStartTime == -1) {
+            // If laundry is marked out but no start time saved, use now as fallback
+            laundryStartTime = System.currentTimeMillis();
+            prefs.edit().putLong("laundry_start_time", laundryStartTime).apply();
+        }
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
@@ -181,19 +192,25 @@ public class DashboardActivity extends AppCompatActivity {
                 // Jemuran di luar → Masukan
                 isLaundryOut = false;
                 android.widget.Toast.makeText(this, "Jemuran dimasukkan", android.widget.Toast.LENGTH_SHORT).show();
-                dbHelper.addLog("Manual", "Jemuran dimasukkan secara manual", "user", "action");
+                dbHelper.addLog("Manual", "Jemuran dimasukkan secara manual", "user", "in");
                 firebaseHelper.updateLaundryStatus("in");
             } else {
                 // Jemuran di dalam → Keluarkan
                 laundryStartTime = System.currentTimeMillis();
                 isLaundryOut = true;
                 android.widget.Toast.makeText(this, "Jemuran dikeluarkan", android.widget.Toast.LENGTH_SHORT).show();
-                dbHelper.addLog("Manual", "Jemuran dikeluarkan secara manual", "user", "action");
+                dbHelper.addLog("Manual", "Jemuran dikeluarkan secara manual", "user", "out");
                 firebaseHelper.updateLaundryStatus("out");
             }
             updateLaundryButton();
             updateLaundryStatusSection();
             firebaseHelper.syncLogs();
+            // Persist laundry state
+            android.content.SharedPreferences.Editor editor = getSharedPreferences("RainSafePrefs", MODE_PRIVATE).edit();
+            editor.putBoolean("laundry_out", isLaundryOut);
+            if (isLaundryOut) editor.putLong("laundry_start_time", laundryStartTime);
+            else editor.remove("laundry_start_time");
+            editor.apply();
         });
 
         // Inisialisasi tampilan button & status section
@@ -321,6 +338,7 @@ public class DashboardActivity extends AppCompatActivity {
             if (rainMm > 0) {
                 desc = "Sedang Hujan";
                 isRaining = true;
+                wasRaining = true;
             } else if (precipProb >= 70) {
                 desc = "Berpotensi Hujan";
             } else if (precipProb >= 40) {
@@ -328,6 +346,7 @@ public class DashboardActivity extends AppCompatActivity {
             } else {
                 desc = "Cerah Berawan";
                 isRaining = false;
+                wasRaining = false;
             }
             tvWeatherDesc.setText(desc);
         }
@@ -366,6 +385,12 @@ public class DashboardActivity extends AppCompatActivity {
                     isLaundryOut = newLaundryOut;
                     updateLaundryButton();
                     updateLaundryStatusSection();
+                    // Persist laundry state when Firebase control changes
+                    android.content.SharedPreferences.Editor editor = getSharedPreferences("RainSafePrefs", MODE_PRIVATE).edit();
+                    editor.putBoolean("laundry_out", isLaundryOut);
+                    if (isLaundryOut) editor.putLong("laundry_start_time", laundryStartTime);
+                    else editor.remove("laundry_start_time");
+                    editor.apply();
                 }
                 updateSensorUI();
             });
@@ -421,11 +446,20 @@ public class DashboardActivity extends AppCompatActivity {
             tvLaundryPositionBadge.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
             tvLaundryPositionBadge.setBackgroundResource(R.drawable.status_green_bg);
 
-            // Tampilkan waktu mulai
+            // Tampilkan waktu mulai (fallback jika belum ada)
             if (tvLaundryStartTime != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd MMM yyyy", new Locale("id", "ID"));
-                String startStr = sdf.format(new Date(laundryStartTime));
-                tvLaundryStartTime.setText(startStr);
+                if (laundryStartTime <= 0) {
+                    tvLaundryStartTime.setText("Baru saja");
+                } else {
+                    long elapsed = System.currentTimeMillis() - laundryStartTime;
+                    if (elapsed < 60 * 1000) {
+                        tvLaundryStartTime.setText("Baru saja");
+                    } else {
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd MMM yyyy", new Locale("id", "ID"));
+                        String startStr = sdf.format(new Date(laundryStartTime));
+                        tvLaundryStartTime.setText(startStr);
+                    }
+                }
             }
         } else {
             // Badge abu-abu "Di Dalam"
@@ -471,12 +505,20 @@ public class DashboardActivity extends AppCompatActivity {
             }
         }
 
-        // Update Duration (hanya saat jemuran di luar)
+        // Update Duration (hanya saat jemuran di luar) dengan fallback
         if (isLaundryOut) {
-            long elapsedMillis = System.currentTimeMillis() - laundryStartTime;
-            long minutes = (elapsedMillis / (1000 * 60)) % 60;
-            long hours = (elapsedMillis / (1000 * 60 * 60));
-            tvCurrentDuration.setText(hours + " jam " + minutes + " menit");
+            if (laundryStartTime <= 0) {
+                tvCurrentDuration.setText("Baru saja");
+            } else {
+                long elapsedMillis = System.currentTimeMillis() - laundryStartTime;
+                if (elapsedMillis < 60 * 1000) {
+                    tvCurrentDuration.setText("Baru saja");
+                } else {
+                    long minutes = (elapsedMillis / (1000 * 60)) % 60;
+                    long hours = (elapsedMillis / (1000 * 60 * 60));
+                    tvCurrentDuration.setText(hours + " jam " + minutes + " menit");
+                }
+            }
         } else {
             tvCurrentDuration.setText("—");
         }
@@ -491,6 +533,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             if (currentStatus.equalsIgnoreCase("Hujan") && !isRaining) {
                 isRaining = true;
+                wasRaining = true;
                 notificationDot.setVisibility(View.VISIBLE);
 
                 if (!isLaundryOut) {
@@ -530,7 +573,7 @@ public class DashboardActivity extends AppCompatActivity {
         try {
             double dryingPower = 15.0 + (lightVal * 0.04);
 
-            if (isLaundryOut && !isRaining) {
+            if (isLaundryOut && !isRaining && laundryStartTime > 0) {
                 long elapsedMinutes = (System.currentTimeMillis() - laundryStartTime) / (1000 * 60);
                 int dryness = (int) (elapsedMinutes * (dryingPower / 50.0));
                 if (dryness >= 100) {
