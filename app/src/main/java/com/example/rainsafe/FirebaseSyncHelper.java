@@ -144,6 +144,40 @@ public class FirebaseSyncHelper {
                         dbHelper.updateSensorData(sensorName, value, status);
                         Log.d(TAG, "Sensor " + sensorName + " updated: " + value + " / " + status);
                         if (listener != null) listener.onSensorChanged(sensorName, value, status, unit);
+
+                        // If Sensor Cahaya (LDR) updated, decide dark/bright using status or numeric value
+                        if ("Sensor Cahaya".equals(sensorName)) {
+                            android.content.SharedPreferences prefs = context.getSharedPreferences("RainSafePrefs", Context.MODE_PRIVATE);
+                            boolean wasDark = prefs.getBoolean("sensor_cahaya_dark", false);
+                            boolean isDark = false;
+                            try {
+                                // Prefer explicit status field if available
+                                if (unit != null && !unit.isEmpty() && (status.equalsIgnoreCase("Gelap") || status.equalsIgnoreCase("Terang"))) {
+                                    isDark = status.equalsIgnoreCase("Gelap");
+                                } else {
+                                    int lux = Integer.parseInt(value.replaceAll("[^0-9]", ""));
+                                    int threshold = 1000; // match firmware threshold (higher = darker)
+                                    isDark = lux >= threshold;
+                                }
+
+                                if (isDark && !wasDark) {
+                                    // dark started
+                                    NotificationHelper.sendNotification(context, 2001,
+                                            "Kondisi Gelap Terdeteksi",
+                                            "Sensor cahaya mendeteksi kondisi gelap. Periksa jemuran Anda.");
+                                    dbHelper.addLog("Kondisi Gelap Terdeteksi", "Sensor cahaya: " + value + " " + unit, "system", "sensor");
+                                    prefs.edit().putBoolean("sensor_cahaya_dark", true).apply();
+                                } else if (!isDark && wasDark) {
+                                    // bright returned
+                                    NotificationHelper.sendNotification(context, 2002,
+                                            "Cahaya Kembali Terang",
+                                            "Sensor cahaya menunjukkan kondisi terang lagi.");
+                                    prefs.edit().putBoolean("sensor_cahaya_dark", false).apply();
+                                }
+                            } catch (Exception e) {
+                                Log.w(TAG, "Failed to evaluate sensor_cahaya: " + e.getMessage());
+                            }
+                        }
                     }
                 }
             }
