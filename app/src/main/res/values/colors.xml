@@ -21,4 +21,5 @@
     <color name="tab_active">#304FFE</color>
     <color name="tab_inactive">#888888</color>
     <color name="tab_line_inactive">#EEEEEE</color>
+    <color name="ic_logo_background">#158396</color>
 </resources>

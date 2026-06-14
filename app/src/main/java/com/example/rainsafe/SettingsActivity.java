@@ -3,18 +3,20 @@ package com.example.rainsafe;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.Insets;
+import android.view.View;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -23,13 +25,12 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
 
     // Settings Elements
-    private SwitchCompat swNightMode, swRainSensor, swLightSensor, swNotifRain, swNotifLaundry, swNotifError, swDarkMode;
+    private SwitchCompat swRainSensor, swLightSensor, swNotifRain, swNotifLaundry, swNotifError, swDarkMode;
     private RelativeLayout rlChangePassword;
 
     private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "RainSafePrefs";
 
-    private ImageView ivAutoSectionIcon;
     private FirebaseSyncHelper firebaseHelper;
 
     @Override
@@ -39,18 +40,36 @@ public class SettingsActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         firebaseHelper = new FirebaseSyncHelper(this);
+        // Edge-to-edge handling
+        EdgeToEdge.enable(this);
+// Removed duplicate setContentView call (handled earlier)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, systemBars.top, 0, 0);
+            View bottomNav = findViewById(R.id.bottomNavContainer);
+            if (bottomNav != null) {
+                int bottomInset = systemBars.bottom;
+                bottomNav.setPadding(bottomNav.getPaddingLeft(), bottomNav.getPaddingTop(), bottomNav.getPaddingRight(), bottomInset);
+                android.view.ViewGroup.LayoutParams params = bottomNav.getLayoutParams();
+                int baseHeight = (int) android.util.TypedValue.applyDimension(
+                    android.util.TypedValue.COMPLEX_UNIT_DIP, 75, v.getResources().getDisplayMetrics());
+                params.height = baseHeight + bottomInset;
+                bottomNav.setLayoutParams(params);
+            }
+            return insets;
+        });
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
         navHistory = findViewById(R.id.navHistory);
         navSettings = findViewById(R.id.navSettings);
         navProfile = findViewById(R.id.navProfile);
-        
+
         ivHome = findViewById(R.id.ivHome);
         ivHistory = findViewById(R.id.ivHistory);
         ivSettings = findViewById(R.id.ivSettings);
         ivProfile = findViewById(R.id.ivProfile);
-        
+
         tvHome = findViewById(R.id.tvHome);
         tvHistory = findViewById(R.id.tvHistory);
         tvSettings = findViewById(R.id.tvSettings);
@@ -76,7 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
             overridePendingTransition(0, 0);
             finish();
         });
-        
+
         navHistory.setOnClickListener(v -> {
             Intent intent = new Intent(this, HistoryActivity.class);
             intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
@@ -99,20 +118,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initSettingsViews() {
-        swNightMode = findViewById(R.id.swNightMode);
         swRainSensor = findViewById(R.id.swRainSensor);
         swLightSensor = findViewById(R.id.swLightSensor);
         swNotifRain = findViewById(R.id.swNotifRain);
         swNotifLaundry = findViewById(R.id.swNotifLaundry);
         swNotifError = findViewById(R.id.swNotifError);
         swDarkMode = findViewById(R.id.swDarkMode);
-
         rlChangePassword = findViewById(R.id.rlChangePassword);
-        ivAutoSectionIcon = findViewById(R.id.ivAutoSectionIcon);
     }
 
     private void loadSettings() {
-        swNightMode.setChecked(sharedPreferences.getBoolean("night_mode", false));
         swRainSensor.setChecked(sharedPreferences.getBoolean("rain_sensor", true));
         swLightSensor.setChecked(sharedPreferences.getBoolean("light_sensor", true));
         swNotifRain.setChecked(sharedPreferences.getBoolean("notif_rain", true));
@@ -122,13 +137,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupSettingsListeners() {
-        swNightMode.setOnCheckedChangeListener((v, isChecked) -> saveSetting("night_mode", isChecked));
         swRainSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("rain_sensor", isChecked));
         swLightSensor.setOnCheckedChangeListener((v, isChecked) -> saveSetting("light_sensor", isChecked));
         swNotifRain.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_rain", isChecked));
         swNotifLaundry.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_laundry", isChecked));
         swNotifError.setOnCheckedChangeListener((v, isChecked) -> saveSetting("notif_error", isChecked));
-        
+
         swDarkMode.setOnCheckedChangeListener((v, isChecked) -> {
             if (v.isPressed()) {
                 saveSetting("dark_mode", isChecked);
@@ -142,15 +156,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        rlChangePassword.setOnClickListener(v -> Toast.makeText(this, "Fitur Ganti Password akan segera hadir", Toast.LENGTH_SHORT).show());
+        rlChangePassword.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChangePasswordActivity.class);
+            intent.putExtra("USER_IDENTIFIER", getIntent().getStringExtra("USER_IDENTIFIER"));
+            intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
+            startActivity(intent);
+        });
     }
 
     private void saveSetting(String key, boolean value) {
         sharedPreferences.edit().putBoolean(key, value).apply();
-    }
-
-    private void saveSetting(String key, String value) {
-        sharedPreferences.edit().putString(key, value).apply();
     }
 
     private void updateNavUI(int position) {
@@ -162,12 +177,12 @@ public class SettingsActivity extends AppCompatActivity {
         ivHistory.setColorFilter(grey);
         ivSettings.setColorFilter(grey);
         ivProfile.setColorFilter(grey);
-        
+
         tvHome.setTextColor(grey);
         tvHistory.setTextColor(grey);
         tvSettings.setTextColor(grey);
         tvProfile.setTextColor(grey);
-        
+
         tvHome.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvHistory.setTypeface(null, android.graphics.Typeface.NORMAL);
         tvSettings.setTypeface(null, android.graphics.Typeface.NORMAL);

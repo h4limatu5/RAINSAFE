@@ -48,11 +48,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
             <View
+                android:id="@+id/ivStatusDot"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:background="@drawable/indicator_active"
                 android:backgroundTint="#4CAF50" />
             <TextView
+                android:id="@+id/tvStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -70,6 +72,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/btnRefresh"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="8dp"
@@ -86,8 +89,12 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/btnNotifications"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/posisi_box_bg"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
@@ -190,11 +197,22 @@
                         android:text="+62 812-3456-7890"
                         android:textColor="@color/text_grey"
                         android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnEditProfile"
+                        android:layout_width="200dp"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="@color/button_blue"
+                        android:text="EDIT PROFIL"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Profile Edit Form -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvEditForm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -278,11 +296,22 @@
                         android:text="SIMPAN PERUBAHAN"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnCancelForm"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="@color/text_grey"
+                        android:text="BATAL"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Informasi Perangkat Section -->
             <TextView
+                android:id="@+id/sectionDeviceTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -296,6 +325,7 @@
                 app:drawableTint="#3498db" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvDeviceCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -390,6 +420,7 @@
 
             <!-- Aktivitas Section -->
             <TextView
+                android:id="@+id/sectionActivityTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -403,6 +434,7 @@
                 app:drawableTint="#3498db" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvActivityCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -426,6 +458,7 @@
                             android:text="@string/profile_label_total_usage"
                             android:textColor="@color/text_grey" />
                         <TextView
+                            android:id="@+id/tvTotalUsage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -444,6 +477,7 @@
                             android:text="@string/profile_label_last_used"
                             android:textColor="@color/text_grey" />
                         <TextView
+                            android:id="@+id/tvLastUsed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"

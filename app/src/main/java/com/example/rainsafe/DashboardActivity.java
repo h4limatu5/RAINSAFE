@@ -12,8 +12,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.activity.EdgeToEdge;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.Insets;
+import android.view.View;
 
 import org.json.JSONObject;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -34,10 +44,8 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView tvHome, tvHistory, tvSettings, tvProfile;
 
     // Real-time Views
-    private TextView tvRainProbVal, tvCurrentDuration, tvStatsTotalDuration;
+    private TextView tvRainProbVal, tvCurrentDuration;
     private TextView tvSensorRainStatus, tvSensorLightStatus;
-    private TextView tvDrynessPercent, tvDrynessEst;
-    private ProgressBar pbDryness;
     private View notificationDot;
     private ImageView ivAutoIcon;
     private CardView cvAutoIcon;
@@ -47,7 +55,6 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView tvAutoStatus;           // Teks "Aktif / Non-aktif" di card otomatisasi
     private TextView tvLaundryPositionBadge; // Badge Di Luar / Di Dalam
     private TextView tvLaundryStartTime;    // Waktu mulai jemuran dikeluarkan
-    private TextView tvLaundryInsideMsg;    // Pesan jemuran di dalam
     private androidx.appcompat.widget.SwitchCompat swAutoMode;
     private boolean isAutoModeSwitchUpdating = false; // Guard to prevent echo loop
     private boolean isManualCommand = false;           // Guard: block Firebase echo after manual action
@@ -59,10 +66,15 @@ public class DashboardActivity extends AppCompatActivity {
     // Weather (Open-Meteo)
     private TextView tvBigTemp, tvWeatherDesc;
     private static final String OPEN_METEO_URL =
-        "https://api.open-meteo.com/v1/forecast?latitude=-3.742650&longitude=114.731153" +
+        "https://api.open-meteo.com/v1/forecast?latitude=-3.7667&longitude=114.7667" +
         "&current=temperature_2m,relative_humidity_2m,rain" +
         "&hourly=precipitation_probability,rain&timezone=Asia/Jakarta";
     private ExecutorService weatherExecutor = Executors.newSingleThreadExecutor();
+
+    // Connection status views
+    private View ivStatusDot;
+    private TextView tvStatusText;
+    private ValueEventListener connectivityListener;
 
     private DatabaseHelper dbHelper;
     private FirebaseSyncHelper firebaseHelper;
@@ -72,7 +84,24 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_dashboard);
+        // Apply window insets to bottom navigation to avoid overlap with system navigation bar
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, systemBars.top, 0, 0);
+            View bottomNav = findViewById(R.id.bottomNavContainer);
+            if (bottomNav != null) {
+                int bottomInset = systemBars.bottom;
+                bottomNav.setPadding(bottomNav.getPaddingLeft(), bottomNav.getPaddingTop(), bottomNav.getPaddingRight(), bottomInset);
+                android.view.ViewGroup.LayoutParams params = bottomNav.getLayoutParams();
+                int baseHeight = (int) android.util.TypedValue.applyDimension(
+                    android.util.TypedValue.COMPLEX_UNIT_DIP, 75, v.getResources().getDisplayMetrics());
+                params.height = baseHeight + bottomInset;
+                bottomNav.setLayoutParams(params);
+            }
+            return insets;
+        });
 
         dbHelper = new DatabaseHelper(this);
         firebaseHelper = new FirebaseSyncHelper(this);
@@ -96,12 +125,8 @@ public class DashboardActivity extends AppCompatActivity {
         // Initialize Real-time Views
         tvRainProbVal = findViewById(R.id.tvRainProbVal);
         tvCurrentDuration = findViewById(R.id.tvCurrentDuration);
-        tvStatsTotalDuration = findViewById(R.id.tvStatsTotalDuration);
         tvSensorRainStatus = findViewById(R.id.tvSensorRainStatus);
         tvSensorLightStatus = findViewById(R.id.tvSensorLightStatus);
-        tvDrynessPercent = findViewById(R.id.tv_val_dry_percent);
-        tvDrynessEst = findViewById(R.id.tv_val_dry_est);
-        pbDryness = findViewById(R.id.pb_dryness);
         notificationDot = findViewById(R.id.notificationDot);
         ivAutoIcon = findViewById(R.id.ivAutoIcon);
         cvAutoIcon = findViewById(R.id.cvAutoIcon);
@@ -112,11 +137,15 @@ public class DashboardActivity extends AppCompatActivity {
         tvLaundryActionLabel = findViewById(R.id.tvLaundryActionLabel);
         tvLaundryPositionBadge = findViewById(R.id.tvLaundryPositionBadge);
         tvLaundryStartTime = findViewById(R.id.tvLaundryStartTime);
-        tvLaundryInsideMsg = findViewById(R.id.tvLaundryInsideMsg);
 
         // Weather Views
         tvBigTemp = findViewById(R.id.tvBigTemp);
         tvWeatherDesc = findViewById(R.id.tvWeatherDesc);
+
+        // Connection Status Views
+        ivStatusDot = findViewById(R.id.ivStatusDot);
+        tvStatusText = findViewById(R.id.tvStatusText);
+        startListeningConnection();
 
         findViewById(R.id.btnRefresh).setOnClickListener(v -> {
             updateSensorUI();
@@ -182,19 +211,6 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(new Intent(this, NotificationsActivity.class));
         });
 
-        findViewById(R.id.btnTestNotif).setOnClickListener(v -> {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    androidx.core.app.ActivityCompat.requestPermissions(this,
-                            new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1004);
-                } else {
-                    showNotificationAlert("RainSafe Test", "Notifikasi berhasil muncul!");
-                }
-            } else {
-                showNotificationAlert("RainSafe Test", "Notifikasi berhasil muncul!");
-            }
-        });
 
         updateNavUI(0);
 
@@ -402,23 +418,24 @@ public class DashboardActivity extends AppCompatActivity {
             // Badge hijau "Di Luar"
             tvLaundryPositionBadge.setText("Di Luar");
             tvLaundryPositionBadge.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
+            tvLaundryPositionBadge.setBackgroundResource(R.drawable.status_green_bg);
 
-            // Tampilkan waktu mulai, sembunyikan pesan di dalam
+            // Tampilkan waktu mulai
             if (tvLaundryStartTime != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd MMM yyyy", new Locale("id", "ID"));
-                String startStr = "Mulai dijemur: " + sdf.format(new Date(laundryStartTime));
+                String startStr = sdf.format(new Date(laundryStartTime));
                 tvLaundryStartTime.setText(startStr);
-                tvLaundryStartTime.setVisibility(View.VISIBLE);
             }
-            if (tvLaundryInsideMsg != null) tvLaundryInsideMsg.setVisibility(View.GONE);
         } else {
             // Badge abu-abu "Di Dalam"
             tvLaundryPositionBadge.setText("Di Dalam");
             tvLaundryPositionBadge.setTextColor(ContextCompat.getColor(this, R.color.text_grey));
+            tvLaundryPositionBadge.setBackgroundResource(R.drawable.status_gray_bg);
 
-            // Sembunyikan waktu mulai, tampilkan pesan di dalam
-            if (tvLaundryStartTime != null) tvLaundryStartTime.setVisibility(View.GONE);
-            if (tvLaundryInsideMsg != null) tvLaundryInsideMsg.setVisibility(View.VISIBLE);
+            // Sembunyikan waktu mulai dengan strip
+            if (tvLaundryStartTime != null) {
+                tvLaundryStartTime.setText("—");
+            }
         }
     }
 
@@ -459,7 +476,6 @@ public class DashboardActivity extends AppCompatActivity {
             long minutes = (elapsedMillis / (1000 * 60)) % 60;
             long hours = (elapsedMillis / (1000 * 60 * 60));
             tvCurrentDuration.setText(hours + " jam " + minutes + " menit");
-            tvStatsTotalDuration.setText((6 + hours) + " jam " + (10 + minutes) + " menit");
         } else {
             tvCurrentDuration.setText("—");
         }
@@ -484,14 +500,15 @@ public class DashboardActivity extends AppCompatActivity {
             }
         }
 
+        int lightVal = 0;
         if (!lightData.isEmpty()) {
             tvSensorLightStatus.setText(lightData.get("status"));
+            try {
+                lightVal = Integer.parseInt(lightData.get("value"));
+            } catch (Exception e) {}
         }
-
         // Dryness Calculation
         try {
-            int lightVal = 0;
-            if (!lightData.isEmpty()) lightVal = Integer.parseInt(lightData.get("value"));
             double dryingPower = 15.0 + (lightVal * 0.04);
 
             if (isLaundryOut && !isRaining) {
@@ -506,16 +523,6 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 } else {
                     isDryNotified = false;
-                }
-                if (tvDrynessPercent != null) tvDrynessPercent.setText(dryness + "%");
-                if (pbDryness != null) pbDryness.setProgress(dryness);
-
-                if (dryness < 100) {
-                    int remaining = 100 - dryness;
-                    int estMins = (int) (remaining / (dryingPower / 50.0));
-                    if (tvDrynessEst != null) tvDrynessEst.setText(estMins + " menit lagi");
-                } else {
-                    if (tvDrynessEst != null) tvDrynessEst.setText("Sudah Kering");
                 }
             }
         } catch (Exception e) {
@@ -608,11 +615,61 @@ public class DashboardActivity extends AppCompatActivity {
         updateSensorUI();
     }
 
+    // ─── CONNECTION STATUS ────────────────────────────────────────────────────
+
+    /**
+     * Mendengarkan status koneksi Firebase secara real-time via ".info/connected".
+     * Jika tersambung: dot hijau + teks "Terhubung".
+     * Jika terputus: dot merah + teks "Terputus".
+     */
+    private void startListeningConnection() {
+        connectivityListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = Boolean.TRUE.equals(snapshot.getValue(Boolean.class));
+                runOnUiThread(() -> {
+                    if (ivStatusDot != null) {
+                        ivStatusDot.setBackgroundTintList(
+                            android.content.res.ColorStateList.valueOf(
+                                connected
+                                    ? android.graphics.Color.parseColor("#4CAF50")
+                                    : android.graphics.Color.parseColor("#F44336")
+                            )
+                        );
+                    }
+                    if (tvStatusText != null) {
+                        tvStatusText.setText(connected
+                            ? getString(R.string.dash_status_connected)
+                            : getString(R.string.dash_status_disconnected));
+                        tvStatusText.setTextColor(connected
+                            ? ContextCompat.getColor(DashboardActivity.this, R.color.button_blue)
+                            : android.graphics.Color.parseColor("#F44336"));
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                android.util.Log.e("RainSafe", "Connectivity listener error: " + error.getMessage());
+            }
+        };
+
+        FirebaseDatabase.getInstance(
+            "https://rainsafe-777f2-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        ).getReference(".info/connected").addValueEventListener(connectivityListener);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateRunnable);
         weatherExecutor.shutdown();
+        // Remove connectivity listener
+        if (connectivityListener != null) {
+            FirebaseDatabase.getInstance(
+                "https://rainsafe-777f2-default-rtdb.asia-southeast1.firebasedatabase.app/"
+            ).getReference(".info/connected").removeEventListener(connectivityListener);
+        }
     }
 
     private void updateNavUI(int position) {
@@ -657,4 +714,6 @@ public class DashboardActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
 }

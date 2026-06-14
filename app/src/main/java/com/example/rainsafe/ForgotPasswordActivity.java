@@ -11,78 +11,59 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class ForgotPasswordActivity extends AppCompatActivity {
 
-    private EditText etEmail, etNewPassword, etConfirmPassword;
+    private EditText etEmail;
     private Button btnReset;
-    private ImageView ivBack, ivShowPassword;
+    private ImageView ivBack;
     private TextView tvBackToLogin;
-    private DatabaseHelper dbHelper;
-    private boolean isPasswordVisible = false;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        dbHelper = new DatabaseHelper(this);
+        mAuth = FirebaseAuth.getInstance();
 
         etEmail = findViewById(R.id.etEmail);
-        etNewPassword = findViewById(R.id.etNewPassword);
-        etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnReset = findViewById(R.id.btnReset);
         ivBack = findViewById(R.id.ivBack);
-        ivShowPassword = findViewById(R.id.ivShowPassword);
         tvBackToLogin = findViewById(R.id.tvBackToLogin);
+
+        // Hide password-related views programmatically
+        findViewById(R.id.tvLabelNewPassword).setVisibility(View.GONE);
+        findViewById(R.id.flNewPassword).setVisibility(View.GONE);
+        findViewById(R.id.tvLabelConfirmPassword).setVisibility(View.GONE);
+        findViewById(R.id.flConfirmPassword).setVisibility(View.GONE);
 
         ivBack.setOnClickListener(v -> finish());
         tvBackToLogin.setOnClickListener(v -> finish());
 
-        ivShowPassword.setOnClickListener(v -> {
-            isPasswordVisible = !isPasswordVisible;
-            int inputType = isPasswordVisible ? 
-                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD : 
-                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-            
-            etNewPassword.setInputType(inputType);
-            etConfirmPassword.setInputType(inputType);
-            
-            ivShowPassword.setImageResource(R.drawable.ic_visibility);
-            etNewPassword.setSelection(etNewPassword.getText().length());
-            etConfirmPassword.setSelection(etConfirmPassword.getText().length());
-        });
-
         btnReset.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
-            String newPassword = etNewPassword.getText().toString().trim();
-            String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-            if (email.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Semua field harus diisi", Toast.LENGTH_SHORT).show();
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Email tidak boleh kosong", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!newPassword.equals(confirmPassword)) {
-                Toast.makeText(this, "Password tidak cocok", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            btnReset.setEnabled(false);
+            Toast.makeText(this, "Mengirim email reset password...", Toast.LENGTH_SHORT).show();
 
-            if (newPassword.length() < 6) {
-                Toast.makeText(this, "Password minimal 6 karakter", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (dbHelper.checkEmail(email)) {
-                boolean updated = dbHelper.updatePassword(email, newPassword);
-                if (updated) {
-                    Toast.makeText(this, "Password berhasil diperbarui!", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    Toast.makeText(this, "Gagal memperbarui password", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "Email tidak terdaftar", Toast.LENGTH_SHORT).show();
-            }
+            mAuth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener(task -> {
+                        btnReset.setEnabled(true);
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Tautan reset password berhasil dikirim ke email Anda!", Toast.LENGTH_LONG).show();
+                            finish();
+                        } else {
+                            String errorMsg = task.getException() != null ? task.getException().getMessage() : "Gagal mengirim email reset";
+                            Toast.makeText(this, "Gagal: " + errorMsg, Toast.LENGTH_LONG).show();
+                        }
+                    });
         });
     }
 }

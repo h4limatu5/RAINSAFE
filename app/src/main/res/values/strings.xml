@@ -73,8 +73,9 @@
 
     <!-- Dashboard Screen -->
     <string name="dash_status_connected">Terhubung</string>
+    <string name="dash_status_disconnected">Terputus</string>
     <string name="dash_updated_now">Diperbarui sekarang</string>
-    <string name="dash_location">Banjarmasin, Kalimantan Selatan</string>
+    <string name="dash_location">Desa Panggung, Pelaihari</string>
     <string name="dash_temp">27 °C</string>
     <string name="dash_weather_desc">Cerah Berawan</string>
     <string name="dash_humidity">Kelembaban</string>

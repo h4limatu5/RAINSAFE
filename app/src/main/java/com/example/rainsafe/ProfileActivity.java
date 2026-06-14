@@ -15,6 +15,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.activity.EdgeToEdge;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.Insets;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -28,12 +36,35 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private FirebaseSyncHelper firebaseHelper;
     private String currentPhotoPath = null;
+    private String originalPhotoPath = null;
+    // Connection status
+    private View ivStatusDot;
+    private TextView tvStatusText;
+    private ValueEventListener connectivityListener;
+    private static final String DB_URL = "https://rainsafe-777f2-default-rtdb.asia-southeast1.firebasedatabase.app/";
     private String userEmail = null;
+    private boolean isEditingMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, systemBars.top, 0, 0);
+            View bottomNav = findViewById(R.id.bottomNavContainer);
+            if (bottomNav != null) {
+                int bottomInset = systemBars.bottom;
+                bottomNav.setPadding(bottomNav.getPaddingLeft(), bottomNav.getPaddingTop(), bottomNav.getPaddingRight(), bottomInset);
+                android.view.ViewGroup.LayoutParams params = bottomNav.getLayoutParams();
+                int baseHeight = (int) android.util.TypedValue.applyDimension(
+                    android.util.TypedValue.COMPLEX_UNIT_DIP, 75, v.getResources().getDisplayMetrics());
+                params.height = baseHeight + bottomInset;
+                bottomNav.setLayoutParams(params);
+            }
+            return insets;
+        });
 
         dbHelper = new DatabaseHelper(this);
         firebaseHelper = new FirebaseSyncHelper(this);
@@ -49,16 +80,26 @@ public class ProfileActivity extends AppCompatActivity {
         etFormEmail = findViewById(R.id.etFormEmail);
         etFormPhone = findViewById(R.id.etFormPhone);
 
-        // Load User Data
+        // Load User Data and Activity Data
         loadUserData();
+        loadActivityData();
 
-        // Change Profile Handlers
+        // Change Profile Handlers (Only active when in edit mode)
         if (ivProfilePicture.getParent() instanceof View) {
-            ((View) ivProfilePicture.getParent()).setOnClickListener(v -> openGallery());
+            ((View) ivProfilePicture.getParent()).setOnClickListener(v -> {
+                if (isEditingMode) openGallery();
+            });
         }
-        findViewById(R.id.btnChangePhotoVisible).setOnClickListener(v -> openGallery());
+        findViewById(R.id.btnChangePhotoVisible).setOnClickListener(v -> {
+            if (isEditingMode) openGallery();
+        });
         
         findViewById(R.id.btnSaveForm).setOnClickListener(v -> saveProfileChanges());
+        findViewById(R.id.btnEditProfile).setOnClickListener(v -> setEditingMode(true));
+        findViewById(R.id.btnCancelForm).setOnClickListener(v -> setEditingMode(false));
+
+        // Set initial view state (Viewing Mode)
+        setEditingMode(false);
 
         // Initialize Navigation Views
         navHome = findViewById(R.id.navHome);
@@ -82,6 +123,23 @@ public class ProfileActivity extends AppCompatActivity {
             intent.putExtra("LOGIN_TYPE", getIntent().getStringExtra("LOGIN_TYPE"));
             startActivity(intent);
         });
+
+        // Notification & Refresh buttons
+        findViewById(R.id.btnNotifications).setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
+        });
+        // Refresh button - reload data + reconnect Firebase
+        findViewById(R.id.btnRefresh).setOnClickListener(v -> {
+            loadUserData();
+            loadActivityData();
+            FirebaseDatabase.getInstance(DB_URL).goOnline();
+            Toast.makeText(this, "Data diperbarui", Toast.LENGTH_SHORT).show();
+        });
+
+        // Connection status
+        ivStatusDot = findViewById(R.id.ivStatusDot);
+        tvStatusText = findViewById(R.id.tvStatusText);
+        startListeningConnection();
 
         // Set Profile as Active (Position 3)
         updateNavUI(3);
@@ -117,6 +175,13 @@ public class ProfileActivity extends AppCompatActivity {
         navProfile.setOnClickListener(v -> updateNavUI(3));
         
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
+            // Clear local session
+            android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+            prefs.edit().clear().apply();
+
+            // Sign out from Firebase Auth
+            com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+
             startActivity(new Intent(this, LoginActivity.class));
             finishAffinity();
         });
@@ -143,16 +208,20 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 
                 String photoPath = userData.get("photo");
+                originalPhotoPath = photoPath;
+                currentPhotoPath = photoPath;
                 if (photoPath != null && !photoPath.isEmpty()) {
                     try {
                         Uri photoUri = Uri.parse(photoPath);
                         ivProfilePicture.setImageURI(photoUri);
                         ivProfilePicture.setColorFilter(null);
                         ivProfilePicture.setImageTintList(null);
-                        currentPhotoPath = photoPath;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    ivProfilePicture.setImageResource(R.drawable.ic_person);
+                    ivProfilePicture.setColorFilter(ContextCompat.getColor(this, R.color.button_blue));
                 }
 
                 // Populate Form
@@ -173,6 +242,11 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
+            Toast.makeText(this, "Format email tidak valid", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         boolean success = dbHelper.updateUserProfile(userEmail, newName, newEmail, newPhone, currentPhotoPath);
         if (success) {
             // Sync to Firebase
@@ -183,6 +257,7 @@ public class ProfileActivity extends AppCompatActivity {
             tvProfileEmail.setText(newEmail);
             tvProfilePhone.setText(newPhone);
             Toast.makeText(this, "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
+            setEditingMode(false);
         } else {
             Toast.makeText(this, "Gagal memperbarui profil", Toast.LENGTH_SHORT).show();
         }
@@ -229,21 +304,7 @@ public class ProfileActivity extends AppCompatActivity {
                     ivProfilePicture.setImageURI(imageUri);
                     ivProfilePicture.setColorFilter(null);
                     ivProfilePicture.setImageTintList(null);
-
-                    // Save to DB immediately if we have a valid identifier
-                    if (userEmail != null && !userEmail.isEmpty()) {
-                        String name = etFormName.getText().toString();
-                        String phone = etFormPhone.getText().toString();
-                        boolean success = dbHelper.updateUserProfile(userEmail, name, userEmail, phone, currentPhotoPath);
-                        if (success) {
-                            firebaseHelper.syncUserProfile(userEmail, name, phone, currentPhotoPath);
-                            Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "Gagal menyimpan foto ke database", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(this, "Foto dipilih, klik Simpan untuk memperbarui", Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(this, "Foto dipilih, klik Simpan untuk memperbarui", Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(this, "Gagal memproses foto", Toast.LENGTH_SHORT).show();
@@ -257,6 +318,42 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void setEditingMode(boolean editing) {
+        this.isEditingMode = editing;
+ 
+        View cvEditForm = findViewById(R.id.cvEditForm);
+        View btnChangePhotoVisible = findViewById(R.id.btnChangePhotoVisible);
+        View sectionDeviceTitle = findViewById(R.id.sectionDeviceTitle);
+        View cvDeviceCard = findViewById(R.id.cvDeviceCard);
+        View sectionActivityTitle = findViewById(R.id.sectionActivityTitle);
+        View cvActivityCard = findViewById(R.id.cvActivityCard);
+        View btnLogout = findViewById(R.id.btnLogout);
+        View btnEditProfile = findViewById(R.id.btnEditProfile);
+ 
+        if (cvEditForm != null) {
+            cvEditForm.setVisibility(editing ? View.VISIBLE : View.GONE);
+        }
+        if (btnChangePhotoVisible != null) {
+            btnChangePhotoVisible.setVisibility(editing ? View.VISIBLE : View.GONE);
+        }
+ 
+        int otherVisibility = editing ? View.GONE : View.VISIBLE;
+        if (sectionDeviceTitle != null) sectionDeviceTitle.setVisibility(otherVisibility);
+        if (cvDeviceCard != null) cvDeviceCard.setVisibility(otherVisibility);
+        if (sectionActivityTitle != null) sectionActivityTitle.setVisibility(otherVisibility);
+        if (cvActivityCard != null) cvActivityCard.setVisibility(otherVisibility);
+        if (btnLogout != null) btnLogout.setVisibility(otherVisibility);
+        if (btnEditProfile != null) btnEditProfile.setVisibility(editing ? View.GONE : View.VISIBLE);
+ 
+        if (editing) {
+            etFormName.setText(tvProfileName.getText().toString());
+            etFormEmail.setText(tvProfileEmail.getText().toString());
+            etFormPhone.setText(tvProfilePhone.getText().toString());
+        } else {
+            loadUserData();
+        }
+    }
+ 
     private void showEditDialog(String title, String currentValue, String field) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Ubah " + title);
@@ -332,6 +429,76 @@ public class ProfileActivity extends AppCompatActivity {
                 tvProfile.setTextColor(blue);
                 tvProfile.setTypeface(null, android.graphics.Typeface.BOLD);
                 break;
+        }
+    }
+
+    private void loadActivityData() {
+        java.util.List<Map<String, String>> logs = dbHelper.getAllLogs();
+        int usageCount = 0;
+        String lastUsed = "-";
+        String lastStatus = "Tidak Diketahui";
+        
+        for (Map<String, String> log : logs) {
+            String icon = log.get("icon");
+            if ("out".equals(icon) || "in".equals(icon)) {
+                if (usageCount == 0) {
+                    lastUsed = log.get("time");
+                    lastStatus = "out".equals(icon) ? "Di Luar" : "Di Dalam";
+                }
+                if ("out".equals(icon)) {
+                    usageCount++;
+                }
+            }
+        }
+        
+        TextView tvTotalUsage = findViewById(R.id.tvTotalUsage);
+        TextView tvLastUsed = findViewById(R.id.tvLastUsed);
+        TextView tvLastStatus = findViewById(R.id.tvLastStatus);
+        
+        if (tvTotalUsage != null) tvTotalUsage.setText(usageCount + " kali");
+        if (tvLastUsed != null) tvLastUsed.setText(lastUsed);
+        if (tvLastStatus != null) tvLastStatus.setText(lastStatus);
+    }
+
+    // ─── CONNECTION STATUS ────────────────────────────────────────────────────
+
+    private void startListeningConnection() {
+        connectivityListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = Boolean.TRUE.equals(snapshot.getValue(Boolean.class));
+                runOnUiThread(() -> {
+                    if (ivStatusDot != null) {
+                        ivStatusDot.setBackgroundTintList(
+                            android.content.res.ColorStateList.valueOf(
+                                connected ? android.graphics.Color.parseColor("#4CAF50")
+                                          : android.graphics.Color.parseColor("#F44336")
+                            )
+                        );
+                    }
+                    if (tvStatusText != null) {
+                        tvStatusText.setText(connected
+                            ? getString(R.string.dash_status_connected)
+                            : getString(R.string.dash_status_disconnected));
+                        tvStatusText.setTextColor(connected
+                            ? ContextCompat.getColor(ProfileActivity.this, R.color.button_blue)
+                            : android.graphics.Color.parseColor("#F44336"));
+                    }
+                });
+            }
+            @Override
+            public void onCancelled(DatabaseError error) {}
+        };
+        FirebaseDatabase.getInstance(DB_URL)
+            .getReference(".info/connected").addValueEventListener(connectivityListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (connectivityListener != null) {
+            FirebaseDatabase.getInstance(DB_URL)
+                .getReference(".info/connected").removeEventListener(connectivityListener);
         }
     }
 }

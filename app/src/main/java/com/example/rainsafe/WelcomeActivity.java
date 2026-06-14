@@ -24,13 +24,13 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Check login session
-        android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
-        boolean isLoggedIn = prefs.getBoolean("is_logged_in", false);
-        if (isLoggedIn) {
+        // Check login session with Firebase Auth
+        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            String email = auth.getCurrentUser().getEmail();
             Intent intent = new Intent(WelcomeActivity.this, DashboardActivity.class);
-            intent.putExtra("USER_IDENTIFIER", prefs.getString("user_id", ""));
-            intent.putExtra("LOGIN_TYPE", prefs.getString("login_type", ""));
+            intent.putExtra("USER_IDENTIFIER", email);
+            intent.putExtra("LOGIN_TYPE", "email");
             startActivity(intent);
             finish();
             return;

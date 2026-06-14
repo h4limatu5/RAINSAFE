@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -24,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private View lineTabEmail, lineTabPhone;
     private LinearLayout llEmailForm, llPhoneForm, tabEmail, tabPhone;
     private DatabaseHelper dbHelper;
+    private FirebaseAuth mAuth;
     private boolean isEmailLogin = true;
     private boolean isPasswordVisible = false;
 
@@ -33,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         dbHelper = new DatabaseHelper(this);
+        mAuth = FirebaseAuth.getInstance();
 
         // Views
         etEmail = findViewById(R.id.etEmail);
@@ -147,11 +150,29 @@ public class LoginActivity extends AppCompatActivity {
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Email dan Password tidak boleh kosong", Toast.LENGTH_SHORT).show();
-        } else if (dbHelper.checkLogin(email, password)) {
-            navigateToDashboard();
-        } else {
-            Toast.makeText(this, "Email atau Password salah", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        Toast.makeText(this, "Sedang masuk...", Toast.LENGTH_SHORT).show();
+        btnLogin.setEnabled(false);
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    btnLogin.setEnabled(true);
+                    if (task.isSuccessful()) {
+                        Toast.makeText(LoginActivity.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
+                        
+                        // Sinkronisasi dengan database lokal SQLite
+                        if (!dbHelper.checkEmail(email)) {
+                            dbHelper.insertUser("User RainSafe", email, "-", password);
+                        }
+                        
+                        navigateToDashboard();
+                    } else {
+                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Email atau Password salah";
+                        Toast.makeText(LoginActivity.this, "Gagal Login: " + errorMsg, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void performPhoneLogin() {

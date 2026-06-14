@@ -287,6 +287,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return logs;
     }
 
+    // Method to check login by phone and password
+    public boolean checkLoginByPhone(String phone, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_PHONE + "=? AND " + COLUMN_PASSWORD + "=?",
+                new String[]{phone, password});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+
+    // Method to update password by phone
+    public boolean updatePasswordByPhone(String phone, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_PASSWORD, newPassword);
+        int result = db.update(TABLE_USERS, contentValues, COLUMN_PHONE + " = ?", new String[]{phone});
+        return result > 0;
+    }
+
     // Clear all logs
     public void clearAllLogs() {
         SQLiteDatabase db = this.getWritableDatabase();
