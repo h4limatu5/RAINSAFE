@@ -175,15 +175,22 @@ public class ProfileActivity extends BaseActivity {
         navProfile.setOnClickListener(v -> updateNavUI(3));
         
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
-            // Clear local session
-            android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
-            prefs.edit().clear().apply();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Konfirmasi Logout")
+                .setMessage("Anda yakin ingin logout?")
+                .setPositiveButton("Ya", (dialog, which) -> {
+                    // Clear local session
+                    android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+                    prefs.edit().clear().apply();
 
-            // Sign out from Firebase Auth
-            com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+                    // Sign out from Firebase Auth
+                    com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
 
-            startActivity(new Intent(this, LoginActivity.class));
-            finishAffinity();
+                    startActivity(new Intent(this, LoginActivity.class));
+                    finishAffinity();
+                })
+                .setNegativeButton("Tidak", null)
+                .show();
         });
     }
 

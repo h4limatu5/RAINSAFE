@@ -60,17 +60,24 @@ public class MenuActivity extends BaseActivity {
         });
 
         findViewById(R.id.menuLogout).setOnClickListener(v -> {
-            // Clear local session
-            android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
-            prefs.edit().clear().apply();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Konfirmasi Logout")
+                .setMessage("Anda yakin ingin logout?")
+                .setPositiveButton("Ya", (dialog, which) -> {
+                    // Clear local session
+                    android.content.SharedPreferences prefs = getSharedPreferences("RainSafePrefs", MODE_PRIVATE);
+                    prefs.edit().clear().apply();
 
-            // Sign out from Firebase Auth
-            com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+                    // Sign out from Firebase Auth
+                    com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
 
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("Tidak", null)
+                .show();
         });
     }
 }

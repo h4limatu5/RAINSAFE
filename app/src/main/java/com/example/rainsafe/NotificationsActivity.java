@@ -43,16 +43,30 @@ public class NotificationsActivity extends BaseActivity {
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
         adapter = new NotificationAdapter(new ArrayList<>(), position -> {
             NotificationModel notification = adapter.getNotifications().get(position);
-            dbHelper.deleteLog(notification.getId());
-            loadNotifications();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Hapus Notifikasi")
+                .setMessage("Hapus notifikasi \"" + notification.getTitle() + "\"?")
+                .setPositiveButton("Hapus", (dialog, which) -> {
+                    dbHelper.deleteLog(notification.getId());
+                    loadNotifications();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
         });
         rvNotifications.setAdapter(adapter);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         btnClearAll.setOnClickListener(v -> {
-            dbHelper.clearAllLogs();
-            loadNotifications();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Hapus Semua Notifikasi")
+                .setMessage("Anda yakin ingin menghapus semua notifikasi?")
+                .setPositiveButton("Hapus Semua", (dialog, which) -> {
+                    dbHelper.clearAllLogs();
+                    loadNotifications();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
         });
 
         startRealtimeUpdate();
