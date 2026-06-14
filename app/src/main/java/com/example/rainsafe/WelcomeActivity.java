@@ -68,6 +68,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             }
         });
+        // Initialize page content
+        updatePageContent();
     }
 
     private void updatePageContent() {
@@ -78,25 +80,25 @@ public class WelcomeActivity extends AppCompatActivity {
 
         switch (currentPage) {
             case 0:
-                ivFeatureIcon.setImageResource(R.drawable.download_removebg_preview);
+                ivFeatureIcon.setImageResource(R.mipmap.ic_app_logo_foreground);
                 tvFeatureTitle.setText("Deteksi Hujan Cerdas");
                 tvFeatureDesc.setText("Sensor otomatis masukkan jemuran saat hujan terdeteksi");
                 updateIndicators(indicator1);
                 break;
             case 1:
-                ivFeatureIcon.setImageResource(R.drawable.download__3__removebg_preview);
+                ivFeatureIcon.setImageResource(R.mipmap.ic_app_logo_foreground);
                 tvFeatureTitle.setText("Kontrol Jarak Jauh");
                 tvFeatureDesc.setText("Kendalikan jemuran Anda dari mana saja melalui smartphone");
                 updateIndicators(indicator2);
                 break;
             case 2:
-                ivFeatureIcon.setImageResource(R.drawable.download__4__removebg_preview);
+                ivFeatureIcon.setImageResource(R.mipmap.ic_app_logo_foreground);
                 tvFeatureTitle.setText("Notifikasi Real-time");
                 tvFeatureDesc.setText("Dapatkan pemberitahuan instan saat cuaca berubah");
                 updateIndicators(indicator3);
                 break;
             case 3:
-                ivFeatureIcon.setImageResource(R.drawable.screenshot_2026_03_21_201332_removebg_preview);
+                ivFeatureIcon.setImageResource(R.mipmap.ic_app_logo_foreground);
                 tvFeatureTitle.setText("Mulai Sekarang");
                 tvFeatureDesc.setText("Bergabunglah dengan RainSafe untuk laundry yang lebih cerdas");
                 btnNext.setText("Get Started");

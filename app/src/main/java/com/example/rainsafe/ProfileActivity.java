@@ -437,6 +437,7 @@ public class ProfileActivity extends AppCompatActivity {
         int usageCount = 0;
         String lastUsed = "-";
         String lastStatus = "Tidak Diketahui";
+        long totalDurationMinutes = 0;
         
         for (Map<String, String> log : logs) {
             String icon = log.get("icon");
@@ -450,14 +451,51 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         }
+        // Calculate total duration by pairing out->in events (iterate oldest->newest)
+        String lastOutTime = null;
+        for (int i = logs.size() - 1; i >= 0; i--) {
+            Map<String, String> log = logs.get(i);
+            String icon = log.get("icon");
+            String timeStr = log.get("time"); // format HH:mm
+            if ("out".equals(icon)) {
+                lastOutTime = timeStr;
+            } else if ("in".equals(icon)) {
+                if (lastOutTime != null && timeStr != null) {
+                    try {
+                        String[] outParts = lastOutTime.split(":");
+                        String[] inParts = timeStr.split(":");
+                        int outH = Integer.parseInt(outParts[0]);
+                        int outM = Integer.parseInt(outParts[1]);
+                        int inH = Integer.parseInt(inParts[0]);
+                        int inM = Integer.parseInt(inParts[1]);
+                        int diffM = (inH * 60 + inM) - (outH * 60 + outM);
+                        if (diffM < 0) diffM += 24 * 60;
+                        totalDurationMinutes += diffM;
+                        lastOutTime = null;
+                    } catch (Exception e) {
+                        // ignore parse errors
+                    }
+                }
+            }
+        }
         
         TextView tvTotalUsage = findViewById(R.id.tvTotalUsage);
         TextView tvLastUsed = findViewById(R.id.tvLastUsed);
         TextView tvLastStatus = findViewById(R.id.tvLastStatus);
+        TextView tvTotalDuration = findViewById(R.id.tvTotalDuration);
         
         if (tvTotalUsage != null) tvTotalUsage.setText(usageCount + " kali");
         if (tvLastUsed != null) tvLastUsed.setText(lastUsed);
         if (tvLastStatus != null) tvLastStatus.setText(lastStatus);
+        if (tvTotalDuration != null) {
+            if (totalDurationMinutes < 60) {
+                tvTotalDuration.setText(totalDurationMinutes + " mnt");
+            } else {
+                long h = totalDurationMinutes / 60;
+                long m = totalDurationMinutes % 60;
+                tvTotalDuration.setText(h + "j " + m + "m");
+            }
+        }
     }
 
     // ─── CONNECTION STATUS ────────────────────────────────────────────────────

@@ -177,6 +177,8 @@
     <string name="profile_val_last_used">Hari Ini</string>
     <string name="profile_label_last_status">Status Terakhir</string>
     <string name="profile_val_last_status">Jemuran Keluar</string>
+    <string name="profile_label_total_duration">Total Durasi</string>
+    <string name="profile_val_total_duration">0 jam 0 menit</string>
 
     <!-- Navigation -->
     <string name="nav_home">Beranda</string>
