@@ -1,8 +1,8 @@
 /**
- * RAINSAFE - ESP32 Smart Laundry System (Anti-Echo Filter & Fixed Smart Override V4)
+ * RAINSAFE - ESP32 Smart Laundry System (Anti-Echo & Emergency Manual-to-Auto V4.3)
  * Board: ESP32 Dev Module
  * Library: Firebase ESP Client (oleh Mobizt)
- * PIN MOTOR: IN1 -> GPIO 18, IN2 -> GPIO 19
+ * PIN MOTOR: IN1 -> GPIO 32, IN2 -> GPIO 33
  */
 
 #include <WiFi.h>
@@ -21,8 +21,8 @@
 // ==========================================
 const int pinHujan  = 13; 
 const int pinCahaya = 12; 
-const int pinIN1 = 32;
-const int pinIN2 = 33;
+const int pinIN1    = 32;
+const int pinIN2    = 33;
 const int pinENA    = -1; 
 
 // ==========================================
@@ -85,7 +85,7 @@ void setup() {
   }
 
   Serial.println("=================================");
-  Serial.println("  RAINSAFE VERSI V4: ANTI-ECHO   ");
+  Serial.println(" RAINSAFE V4.3: EMERGENCY AUTO  ");
   Serial.println("=================================");
 }
 
@@ -153,22 +153,34 @@ void loop() {
   }
 
   // ====================================================================
-  // LOGIKA KEPUTUSAN CUACA OTOMATIS
+  // LOGIKA KEPUTUSAN CUACA & EMERGENCY MANUAL-TO-AUTO OVERRIDE
   // ====================================================================
-  if (autoMode && !motorBergerak) {
-    int kondisiHujan  = digitalRead(pinHujan);  
-    int kondisiCahaya = digitalRead(pinCahaya); 
+  if (!motorBergerak) {
+    int kondisiHujan  = digitalRead(pinHujan);  // LOW = Hujan, HIGH = Kering
+    int kondisiCahaya = digitalRead(pinCahaya); // LOW = Terang, HIGH = Gelap
 
-    if (kondisiHujan == LOW || kondisiCahaya == HIGH) {
-      if (statusJemuranDiLuar) {
-        Serial.println("LOGIKA AUTO: Terdeteksi Hujan/Gelap!");
-        mulaiTarikJemuran();
-      }
-    } 
-    else if (kondisiHujan == HIGH && kondisiCahaya == LOW) {
-      if (!statusJemuranDiLuar) {
-        Serial.println("LOGIKA AUTO: Terdeteksi Cuaca Cerah!");
-        mulaiKeluarkanJemuran();
+    // SYARAT KHUSUS USER: Jika MANUAL, jemuran di LUAR, dan HUJAN -> Paksa ubah ke MODE OTOMATIS
+    if (!autoMode && statusJemuranDiLuar && kondisiHujan == LOW) {
+      autoMode = true;
+      Firebase.RTDB.setBool(&fbdoSet, "/control/auto_mode", true); // Sinkronkan ke aplikasi Android
+      Serial.println("\n[EMERGENCY] Mode MANUAL dibatalkan! Jemuran di luar & Hujan detected. Berpindah ke OTOMATIS...");
+    }
+
+    // Eksekusi Logika Otomatisasi Cuaca
+    if (autoMode) {
+      // KONDISI A: Hujan atau Gelap -> Jemuran masuk
+      if (kondisiHujan == LOW || kondisiCahaya == HIGH) {
+        if (statusJemuranDiLuar) {
+          Serial.println("LOGIKA AUTO: Terdeteksi Hujan/Gelap!");
+          mulaiTarikJemuran();
+        }
+      } 
+      // KONDISI B: Kering dan Terang -> Jemuran keluar
+      else if (kondisiHujan == HIGH && kondisiCahaya == LOW) {
+        if (!statusJemuranDiLuar) {
+          Serial.println("LOGIKA AUTO: Terdeteksi Cuaca Cerah!");
+          mulaiKeluarkanJemuran();
+        }
       }
     }
   }
@@ -258,9 +270,6 @@ void stopMotor() {
   motorBergerak = false;
 }
 
-// ====================================================================
-// PERBAIKAN LOGIKA CALLBACK (DENGAN PENYARING GEMA DATA)
-// ====================================================================
 void streamCallback(FirebaseStream data) {
   String path = data.dataPath();
   String dataType = data.dataType();
@@ -279,7 +288,6 @@ void streamCallback(FirebaseStream data) {
       String newStatus = data.stringData();
       Serial.printf("   -> Perintah Tombol Aplikasi: %s\n", newStatus.c_str());
       
-      // FIX FILTER: Cek apakah perintah dari Firebase berbeda dengan kondisi fisik asli jemuran
       bool adaPerubahanAsli = (newStatus == "in" && statusJemuranDiLuar) || (newStatus == "out" && !statusJemuranDiLuar);
 
       if (adaPerubahanAsli) {
@@ -316,7 +324,6 @@ void streamCallback(FirebaseStream data) {
       Serial.printf("   -> [JSON Induk] Perintah Tombol: %s\n", newStatus.c_str());
       
       if (!motorBergerak) {
-        // FIX FILTER: Cek apakah data massal ini berbeda dengan kondisi fisik asli jemuran
         bool adaPerubahanAsli = (newStatus == "in" && statusJemuranDiLuar) || (newStatus == "out" && !statusJemuranDiLuar);
 
         if (adaPerubahanAsli) {

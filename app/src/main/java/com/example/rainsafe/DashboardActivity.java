@@ -490,11 +490,21 @@ public class DashboardActivity extends AppCompatActivity {
 
             if (currentStatus.equalsIgnoreCase("Hujan") && !isRaining) {
                 isRaining = true;
-                dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran ditarik otomatis.", "system", "rain");
-                showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran ditarik otomatis.");
                 notificationDot.setVisibility(View.VISIBLE);
-                sendEmailNotification("RainSafe: Peringatan Hujan!",
-                    "Halo, sistem RainSafe mendeteksi hujan. Jemuran Anda telah ditarik secara otomatis untuk keamanan.");
+
+                if (!isLaundryOut) {
+                    // Jemuran sudah di dalam — hanya beri tahu soal hujan
+                    dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran sudah di dalam, aman.", "system", "rain");
+                    showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran sudah di dalam, aman.");
+                    sendEmailNotification("RainSafe: Peringatan Hujan!",
+                        "Halo, sistem RainSafe mendeteksi hujan. Jemuran Anda sudah di dalam, tidak ada tindakan diperlukan.");
+                } else {
+                    // Jemuran di luar — ESP32 sudah paksa auto mode & menarik jemuran
+                    dbHelper.addLog("Peringatan Hujan!", "Sensor mendeteksi hujan. Jemuran sedang ditarik otomatis.", "system", "rain");
+                    showNotificationAlert("Peringatan: Hujan Terdeteksi!", "Jemuran sedang ditarik otomatis.");
+                    sendEmailNotification("RainSafe: Peringatan Hujan!",
+                        "Halo, sistem RainSafe mendeteksi hujan. Jemuran Anda sedang ditarik secara otomatis untuk keamanan.");
+                }
             } else if (currentStatus.equalsIgnoreCase("Aman") || currentStatus.equalsIgnoreCase("Cerah")) {
                 isRaining = false;
             }
