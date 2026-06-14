@@ -38,7 +38,7 @@ import com.google.firebase.auth.FirebaseUser;
  *      - If verified → update SQLite password.
  *   5. Show success or error feedback.
  */
-public class ChangePasswordActivity extends AppCompatActivity {
+public class ChangePasswordActivity extends BaseActivity {
 
     private EditText etOldPassword, etNewPassword, etConfirmPassword;
     private ImageView ivToggleOld, ivToggleNew, ivToggleConfirm;

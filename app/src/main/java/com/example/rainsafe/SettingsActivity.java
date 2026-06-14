@@ -18,7 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
 import android.view.View;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     private LinearLayout navHome, navHistory, navSettings, navProfile;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class HistoryActivity extends AppCompatActivity {
+public class HistoryActivity extends BaseActivity {
 
     private LinearLayout navHome, navHistory, navSettings, navProfile;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;

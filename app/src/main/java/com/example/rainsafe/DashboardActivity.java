@@ -37,7 +37,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends BaseActivity {
 
     private LinearLayout navHome, navHistory, navSettings, navProfile;
     private ImageView ivHome, ivHistory, ivSettings, ivProfile;
