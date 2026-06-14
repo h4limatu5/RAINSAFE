@@ -302,8 +302,8 @@ public class HistoryActivity extends BaseActivity {
             displayList.add("HARI INI");
             displayList.addAll(today);
         }
-        // Show 'Lihat Selengkapnya' button when today's list is truncated
-        if (!showAllToday && today.size() > 3 && btnMoreToday != null) {
+        // Show 'Lihat Selengkapnya' button when the filtered list contains more than the default shown today items
+        if (!showAllToday && filtered.size() > 3 && btnMoreToday != null) {
             btnMoreToday.setVisibility(View.VISIBLE);
         } else if (btnMoreToday != null) {
             btnMoreToday.setVisibility(View.GONE);
